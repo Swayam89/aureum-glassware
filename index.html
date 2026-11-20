@@ -1,0 +1,485 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AUREUM — Gold, held in glass</title>
+<meta name="description" content="AUREUM: gold-medallion glassware for homes, bars, hotels and brands. Explore the collection in 3D, design your own glass and request trade pricing.">
+<meta name="theme-color" content="#0b0907">
+<meta property="og:title" content="AUREUM — Gold, held in glass">
+<meta property="og:description" content="Gold-medallion glassware for homes, bars and brands. Explore it in 3D.">
+<meta property="og:image" content="assets/img/hero-render.jpg">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%230b0907'/%3E%3Ccircle cx='32' cy='32' r='22' fill='none' stroke='%23d4a24c' stroke-width='3'/%3E%3Ctext x='32' y='41' text-anchor='middle' font-family='Georgia' font-size='24' fill='%23f3d79a'%3EA%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Inter+Tight:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+} }
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
+<script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js" defer></script>
+</head>
+<body class="is-loading">
+
+<!-- ============ PRELOADER ============ -->
+<div class="preloader" aria-hidden="true">
+  <div class="preloader__inner">
+    <svg class="preloader__glass" viewBox="0 0 120 140">
+      <defs>
+        <clipPath id="glassClip"><path d="M18 10 L22 124 Q22 130 28 130 L92 130 Q98 130 98 124 L102 10 Z"/></clipPath>
+        <linearGradient id="amber" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#f3c66b"/><stop offset="1" stop-color="#9a5512"/>
+        </linearGradient>
+      </defs>
+      <g clip-path="url(#glassClip)"><rect class="preloader__fill" x="0" y="140" width="120" height="140" fill="url(#amber)"/></g>
+      <path class="preloader__outline" d="M18 10 L22 124 Q22 130 28 130 L92 130 Q98 130 98 124 L102 10" fill="none" stroke="#d4a24c" stroke-width="1.5"/>
+      <line class="preloader__rim" x1="16" y1="10" x2="104" y2="10" stroke="#f3d79a" stroke-width="3" stroke-linecap="round"/>
+      <circle class="preloader__coin" cx="60" cy="72" r="17" fill="none" stroke="#f3d79a" stroke-width="1.2"/>
+    </svg>
+    <div class="preloader__brand">AUREUM</div>
+    <div class="preloader__count"><span class="js-load-count">0</span>%</div>
+    <div class="preloader__note">Pouring the collection</div>
+  </div>
+</div>
+
+<div class="grain" aria-hidden="true"></div>
+<div class="cursor" aria-hidden="true"><div class="cursor__dot"></div><div class="cursor__ring"><span class="cursor__label"></span></div></div>
+<div class="progress" aria-hidden="true"><span></span></div>
+
+<!-- ============ NAV ============ -->
+<header class="nav">
+  <a class="nav__logo" href="#top" data-magnetic aria-label="AUREUM home">
+    <svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="18" fill="none" stroke="currentColor" stroke-width="1.2"/><circle cx="20" cy="20" r="13" fill="none" stroke="currentColor" stroke-width=".6" stroke-dasharray="1.5 2"/><text x="20" y="26" text-anchor="middle" font-family="Cormorant Garamond, serif" font-size="17" fill="currentColor">A</text></svg>
+    <span>AUREUM</span>
+  </a>
+  <nav class="nav__links" aria-label="Primary">
+    <a href="#collections" data-magnetic>Collections</a>
+    <a href="#atelier" data-magnetic>Atelier</a>
+    <a href="#gift" data-magnetic>Gifting</a>
+    <a href="#trade" data-magnetic>Trade</a>
+    <a href="#craft" data-magnetic>Craft</a>
+  </nav>
+  <div class="nav__actions">
+    <button class="icon-btn sound-btn" type="button" data-magnetic aria-pressed="false" aria-label="Toggle sound">
+      <span class="sound-btn__bars"><i></i><i></i><i></i><i></i></span><span class="sound-btn__txt">Sound</span>
+    </button>
+    <button class="icon-btn cart-btn" type="button" data-magnetic aria-label="Open bag">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8h14l-1.2 12.2a1 1 0 0 1-1 .8H7.2a1 1 0 0 1-1-.8L5 8Z" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8" fill="none" stroke="currentColor" stroke-width="1.3"/></svg>
+      <span class="cart-btn__count js-cart-count">0</span>
+    </button>
+    <button class="icon-btn menu-btn" type="button" aria-label="Open menu" aria-expanded="false"><i></i><i></i></button>
+  </div>
+</header>
+
+<div class="menu" aria-hidden="true">
+  <nav class="menu__links">
+    <a href="#collections"><small>01</small>Collections</a>
+    <a href="#atelier"><small>02</small>Atelier</a>
+    <a href="#gift"><small>03</small>Gifting</a>
+    <a href="#trade"><small>04</small>Trade &amp; Hospitality</a>
+    <a href="#craft"><small>05</small>Craft</a>
+  </nav>
+  <p class="menu__foot">Gold, held in glass.</p>
+</div>
+
+<canvas id="stage" aria-label="Interactive 3D glass"></canvas>
+<div class="callouts" aria-hidden="true">
+  <div class="callout" data-anchor="rim"><span class="callout__dot"></span><span class="callout__line"></span><div class="callout__text"><b>The gold rim</b><small>A burnished band where the lip meets the hand</small></div></div>
+  <div class="callout" data-anchor="wall"><span class="callout__dot"></span><span class="callout__line"></span><div class="callout__text"><b>Crystal-clear wall</b><small>3.5 mm, thin enough to sing when it clinks</small></div></div>
+  <div class="callout" data-anchor="medallion"><span class="callout__dot"></span><span class="callout__line"></span><div class="callout__text"><b>The medallion</b><small>Raised gold relief inside a beaded bezel</small></div></div>
+  <div class="callout" data-anchor="base"><span class="callout__dot"></span><span class="callout__line"></span><div class="callout__text"><b>Gold-leaf base</b><small>Flakes of gold suspended in a 19 mm heavy base</small></div></div>
+  <div class="callout" data-anchor="coaster"><span class="callout__dot"></span><span class="callout__line"></span><div class="callout__text"><b>Walnut coaster</b><small>Turned solid wood, in every set</small></div></div>
+</div>
+
+<main id="top">
+
+<!-- ============ 3D STORY ============ -->
+<section id="story" class="story">
+
+  <div class="chapter chapter--hero" data-chapter="0">
+    <div class="chapter__sticky">
+      <div class="hero">
+        <p class="eyebrow hero__eyebrow"><span class="line"></span>Glassware · Est. 2026</p>
+        <h1 class="hero__title" data-split>Gold, <em>held</em><br>in glass.</h1>
+        <p class="hero__sub" data-reveal>Heavy crystal, a hand-set gold medallion and a base that glitters with gold leaf. For your home, your bar and your brand.</p>
+        <div class="hero__ctas" data-reveal>
+          <a class="btn btn--gold" href="#collections" data-magnetic><span>Explore the collection</span></a>
+          <a class="btn btn--ghost" href="#trade" data-magnetic><span>Trade &amp; hospitality</span></a>
+        </div>
+      </div>
+      <div class="hero__meta" data-reveal>
+        <span>Drag the glass to spin it</span>
+        <span class="scroll-cue"><i></i>Scroll</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="chapter chapter--pour" data-chapter="1">
+    <div class="chapter__sticky">
+      <div class="panel panel--left">
+        <p class="eyebrow"><span class="line"></span>01 — The ritual</p>
+        <div class="pour-steps">
+          <h2 class="pour-step is-active" data-step="0">Pour<em>.</em></h2>
+          <h2 class="pour-step" data-step="1">Chill<em>.</em></h2>
+          <h2 class="pour-step" data-step="2">Garnish<em>.</em></h2>
+        </div>
+        <p class="panel__copy">Two fingers of something golden, one clear cube, a curl of cinnamon and a sprig of rosemary. Every glass is shaped for this.</p>
+        <div class="meter"><span class="meter__label">Fill</span><span class="meter__bar"><i class="js-fill-bar"></i></span><span class="meter__val js-fill-val">0 ml</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="chapter chapter--macro" data-chapter="2">
+    <div class="chapter__sticky">
+      <div class="panel panel--macro">
+        <p class="eyebrow"><span class="line"></span>02 — Look closer</p>
+        <h2 class="display" data-split>Struck in <em>gold.</em></h2>
+        <p class="panel__copy">Scroll in and the medallion fills the room: fine relief, a beaded bezel and a polish that catches every light in the bar.</p>
+      </div>
+      <div class="zoom-ring" aria-hidden="true"><span class="js-zoom-val">×1.0</span></div>
+    </div>
+  </div>
+
+  <div class="chapter chapter--motifs" data-chapter="3">
+    <div class="chapter__sticky">
+      <div class="motif-ui">
+        <p class="eyebrow"><span class="line"></span>03 — Six medallions</p>
+        <div class="motif-ui__name"><span class="js-motif-family">Regal Beasts</span><strong class="js-motif-name">The Tiger</strong></div>
+        <div class="motif-ui__count"><span class="js-motif-idx">01</span> / 06</div>
+      </div>
+      <div class="motif-chips" role="tablist" aria-label="Medallion motifs">
+        <button type="button" class="chip is-active" data-motif="0"><img src="assets/tex/medallion-tiger.png" alt=""><span>Tiger</span></button>
+        <button type="button" class="chip" data-motif="1"><img src="assets/tex/medallion-lion.png" alt=""><span>Lion</span></button>
+        <button type="button" class="chip" data-motif="2"><img src="assets/tex/medallion-tree.png" alt=""><span>Tree of Life</span></button>
+        <button type="button" class="chip" data-motif="3"><img src="assets/tex/medallion-peacock.png" alt=""><span>Peacock</span></button>
+        <button type="button" class="chip" data-motif="4"><img src="assets/tex/medallion-queen.png" alt=""><span>Queen</span></button>
+        <button type="button" class="chip" data-motif="5"><img src="assets/tex/medallion-king.png" alt=""><span>King</span></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="chapter chapter--anatomy" data-chapter="4">
+    <div class="chapter__sticky">
+      <div class="panel panel--top">
+        <p class="eyebrow"><span class="line"></span>04 — Anatomy of a glass</p>
+        <h2 class="display" data-split>Five layers. <em>One heirloom.</em></h2>
+      </div>
+    </div>
+  </div>
+
+  <div class="chapter chapter--trio" data-chapter="5">
+    <div class="chapter__sticky">
+      <div class="panel panel--top">
+        <p class="eyebrow"><span class="line"></span>05 — The forms</p>
+        <h2 class="display" data-split>Three shapes. <em>One signature.</em></h2>
+      </div>
+      <div class="trio-labels">
+        <a href="#atelier" data-form="rocks" data-cursor="Design"><b>The Rocks</b><small>≈ 340 ml · whisky, old fashioned</small></a>
+        <a href="#atelier" data-form="mug" data-cursor="Design"><b>The Stein</b><small>≈ 580 ml · lager, ale</small></a>
+        <a href="#atelier" data-form="tumbler" data-cursor="Design"><b>The Tumbler</b><small>≈ 360 ml · juice, highballs</small></a>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ============ MARQUEE ============ -->
+<section class="marquee" aria-hidden="true">
+  <div class="marquee__track">
+    <span>Homes</span><i>✦</i><span>Bars</span><i>✦</i><span>Hotels</span><i>✦</i><span>Restaurants</span><i>✦</i><span>Corporate gifting</span><i>✦</i><span>Weddings</span><i>✦</i>
+    <span>Homes</span><i>✦</i><span>Bars</span><i>✦</i><span>Hotels</span><i>✦</i><span>Restaurants</span><i>✦</i><span>Corporate gifting</span><i>✦</i><span>Weddings</span><i>✦</i>
+  </div>
+</section>
+
+<!-- ============ COLLECTIONS ============ -->
+<section id="collections" class="collections">
+  <div class="collections__pin">
+    <div class="collections__head">
+      <p class="eyebrow"><span class="line"></span>The collections</p>
+      <h2 class="display" data-split>Pick your <em>pride.</em></h2>
+      <p class="collections__hint"><span class="js-col-idx">01</span> / 06 · <span class="hint-desktop">scroll</span><span class="hint-touch">swipe</span> to browse · tap to zoom</p>
+    </div>
+    <div class="collections__track js-col-track"></div>
+  </div>
+</section>
+
+<!-- ============ ATELIER (CONFIGURATOR) ============ -->
+<section id="atelier" class="atelier">
+  <div class="section-head">
+    <p class="eyebrow"><span class="line"></span>The Atelier</p>
+    <h2 class="display" data-split>Design <em>yours</em>, in real time.</h2>
+    <p class="section-head__copy">Choose a shape, a medallion, a rim and a pour. Engrave your initials or put your company logo in gold. Drag to turn it, pinch or scroll to zoom.</p>
+  </div>
+  <div class="atelier__grid">
+    <div class="atelier__view" data-cursor="Drag">
+      <canvas id="atelier-canvas" aria-label="Glass configurator 3D view"></canvas>
+      <div class="atelier__badge"><span class="js-at-form">The Rocks</span> · <span class="js-at-motif">Tiger</span></div>
+      <div class="atelier__tools">
+        <button type="button" class="tool js-toast" data-magnetic title="Raise a toast"><svg viewBox="0 0 24 24"><path d="M7 3h5l-.6 7a3 3 0 0 1-3.8 0L7 3Zm10 2h-5l.6 7a3 3 0 0 0 3.8 0L17 5ZM9.5 11v7m-2 3h4m5-8v7m-2 3h4" fill="none" stroke="currentColor" stroke-width="1.2"/></svg><span>Toast</span></button>
+        <button type="button" class="tool js-snap" data-magnetic title="Save image"><svg viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z" fill="none" stroke="currentColor" stroke-width="1.2"/><circle cx="12" cy="13" r="3.5" fill="none" stroke="currentColor" stroke-width="1.2"/></svg><span>Save</span></button>
+        <button type="button" class="tool js-ar" data-magnetic title="View in your room"><svg viewBox="0 0 24 24"><path d="M12 3 4 7.5v9L12 21l8-4.5v-9L12 3Zm0 0v9m0 0 8-4.5M12 12l-8-4.5" fill="none" stroke="currentColor" stroke-width="1.2"/></svg><span>AR</span></button>
+        <button type="button" class="tool js-reset" data-magnetic title="Reset view"><svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 2.4-5.7M4 4v4h4" fill="none" stroke="currentColor" stroke-width="1.2"/></svg><span>Reset</span></button>
+      </div>
+      <div class="atelier__loading js-at-loading">Preparing the atelier…</div>
+    </div>
+    <div class="atelier__panel">
+      <div class="opt">
+        <div class="opt__head"><span>01</span>Shape</div>
+        <div class="seg js-opt-form">
+          <button type="button" data-v="rocks" class="is-active">Rocks</button>
+          <button type="button" data-v="mug">Stein</button>
+          <button type="button" data-v="tumbler">Tumbler</button>
+        </div>
+      </div>
+      <div class="opt">
+        <div class="opt__head"><span>02</span>Medallion</div>
+        <div class="swatches js-opt-motif">
+          <button type="button" data-v="tiger" class="is-active" title="Tiger"><img src="assets/tex/medallion-tiger.png" alt="Tiger"></button>
+          <button type="button" data-v="lion" title="Lion"><img src="assets/tex/medallion-lion.png" alt="Lion"></button>
+          <button type="button" data-v="tree" title="Tree of Life"><img src="assets/tex/medallion-tree.png" alt="Tree of Life"></button>
+          <button type="button" data-v="peacock" title="Peacock"><img src="assets/tex/medallion-peacock.png" alt="Peacock"></button>
+          <button type="button" data-v="queen" title="Queen"><img src="assets/tex/medallion-queen.png" alt="Queen"></button>
+          <button type="button" data-v="king" title="King"><img src="assets/tex/medallion-king.png" alt="King"></button>
+          <button type="button" data-v="monogram" title="Your initials" class="swatch-txt">Aa</button>
+          <button type="button" data-v="logo" title="Your logo" class="swatch-txt">Logo</button>
+        </div>
+        <div class="engrave js-engrave" hidden>
+          <label>Initials <input type="text" maxlength="3" value="SJ" class="js-mono-input" autocomplete="off" spellcheck="false"></label>
+          <small>Up to 3 letters, set in gold relief (+₹450)</small>
+        </div>
+        <div class="engrave js-logo" hidden>
+          <label class="upload"><input type="file" accept="image/*" class="js-logo-input"><span>Upload your logo (PNG or SVG)</span></label>
+          <small>Your mark, struck in gold. For bars, hotels and brands.</small>
+        </div>
+      </div>
+      <div class="opt">
+        <div class="opt__head"><span>03</span>Rim</div>
+        <div class="seg js-opt-rim">
+          <button type="button" data-v="gold" class="is-active"><i style="--c:#e6b45e"></i>Gold</button>
+          <button type="button" data-v="rose"><i style="--c:#e3a088"></i>Rose</button>
+          <button type="button" data-v="platinum"><i style="--c:#d7dbe0"></i>Platinum</button>
+          <button type="button" data-v="none"><i style="--c:transparent"></i>None</button>
+        </div>
+      </div>
+      <div class="opt">
+        <div class="opt__head"><span>04</span>Pour</div>
+        <div class="seg js-opt-fill">
+          <button type="button" data-v="empty">Empty</button>
+          <button type="button" data-v="whisky" class="is-active">Whisky</button>
+          <button type="button" data-v="beer">Lager</button>
+          <button type="button" data-v="juice">Juice</button>
+          <button type="button" data-v="water">Water</button>
+        </div>
+      </div>
+      <div class="opt">
+        <div class="opt__head"><span>05</span>Light</div>
+        <div class="seg js-opt-light">
+          <button type="button" data-v="bar" class="is-active">Bar</button>
+          <button type="button" data-v="day">Daylight</button>
+          <button type="button" data-v="candle">Candlelit</button>
+        </div>
+      </div>
+      <div class="opt opt--buy">
+        <div class="qty">
+          <span>Set of</span>
+          <div class="seg js-opt-qty">
+            <button type="button" data-v="2">2</button>
+            <button type="button" data-v="4" class="is-active">4</button>
+            <button type="button" data-v="6">6</button>
+          </div>
+        </div>
+        <div class="price"><small>Set price</small><strong class="js-price">₹0</strong></div>
+        <button type="button" class="btn btn--gold btn--full js-add-custom" data-magnetic><span>Add to bag</span></button>
+        <a href="#trade" class="btn btn--ghost btn--full js-bulk-link" data-magnetic><span>Need 100+? Get trade pricing</span></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TWO PATHS ============ -->
+<section class="paths">
+  <a class="path" href="#gift" data-cursor="Gift">
+    <div class="path__img" style="--img:url(../assets/img/rocks-collection.webp);--pos:14% 100%"></div>
+    <div class="path__body"><p class="eyebrow">For your home</p><h3>Gift it. Keep it.<br><em>Pour it.</em></h3><span class="path__cta">Build a gift set →</span></div>
+  </a>
+  <a class="path" href="#trade" data-cursor="Trade">
+    <div class="path__img" style="--img:url(../assets/img/rocks-collection.webp);--pos:86% 0%"></div>
+    <div class="path__body"><p class="eyebrow">For your bar &amp; brand</p><h3>Your logo,<br><em>in gold.</em></h3><span class="path__cta">See trade pricing →</span></div>
+  </a>
+</section>
+
+<!-- ============ GIFT BUILDER ============ -->
+<section id="gift" class="gift">
+  <div class="section-head">
+    <p class="eyebrow"><span class="line"></span>Gifting</p>
+    <h2 class="display" data-split>Build a box <em>of four.</em></h2>
+    <p class="section-head__copy">Tap any four glasses to fill the box. Mix shapes and medallions. The lid closes itself, and a full set of four is 10% off.</p>
+  </div>
+  <div class="gift__grid">
+    <div class="gift__picks js-gift-picks"></div>
+    <div class="gift__box-wrap">
+      <div class="giftbox js-giftbox">
+        <div class="giftbox__base">
+          <div class="giftbox__slot" data-slot="0"></div><div class="giftbox__slot" data-slot="1"></div>
+          <div class="giftbox__slot" data-slot="2"></div><div class="giftbox__slot" data-slot="3"></div>
+        </div>
+        <div class="giftbox__lid"><span>AUREUM</span><i class="ribbon ribbon--v"></i><i class="ribbon ribbon--h"></i></div>
+      </div>
+      <div class="gift__summary">
+        <div><small>Your box</small><strong class="js-gift-count">0 / 4</strong></div>
+        <div><small>Total</small><strong class="js-gift-total">₹0</strong></div>
+      </div>
+      <div class="gift__actions">
+        <button type="button" class="btn btn--ghost js-gift-clear" data-magnetic><span>Empty the box</span></button>
+        <button type="button" class="btn btn--gold js-gift-add" data-magnetic disabled><span>Add gift box</span></button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TRADE (B2B) ============ -->
+<section id="trade" class="trade">
+  <div class="section-head">
+    <p class="eyebrow"><span class="line"></span>Trade &amp; hospitality</p>
+    <h2 class="display" data-split>Built for the <em>bar back.</em></h2>
+    <p class="section-head__copy">Bars, hotels, restaurants and corporate gifting teams get tiered pricing, custom medallions and sampling. Move the slider to see your price.</p>
+  </div>
+  <div class="trade__grid">
+    <div class="calc">
+      <div class="calc__row">
+        <label for="calc-form">Glass</label>
+        <div class="seg js-calc-form" id="calc-form">
+          <button type="button" data-v="rocks" class="is-active">Rocks</button>
+          <button type="button" data-v="mug">Stein</button>
+          <button type="button" data-v="tumbler">Tumbler</button>
+        </div>
+      </div>
+      <div class="calc__qty">
+        <div class="calc__qty-top"><span>Quantity</span><strong class="js-calc-qty">240</strong><small>pieces</small></div>
+        <input type="range" min="0" max="1000" value="400" class="range js-calc-range" aria-label="Quantity">
+        <div class="tiers">
+          <span data-tier="0">24+</span><span data-tier="1">100+</span><span data-tier="2">500+</span><span data-tier="3">2,000+</span>
+        </div>
+      </div>
+      <div class="calc__out">
+        <div><small>Unit price</small><strong class="js-calc-unit">₹0</strong></div>
+        <div><small>You save</small><strong class="js-calc-save">0%</strong></div>
+        <div><small>Order total</small><strong class="js-calc-total">₹0</strong></div>
+        <div><small>Lead time</small><strong class="js-calc-lead">—</strong></div>
+      </div>
+      <p class="calc__perk js-calc-perk">Custom logo medallion included from 500 pieces.</p>
+    </div>
+    <form class="rfq js-rfq" novalidate>
+      <h3>Request a quote</h3>
+      <div class="field"><input id="rfq-name" name="name" required placeholder=" "><label for="rfq-name">Your name</label></div>
+      <div class="field"><input id="rfq-company" name="company" required placeholder=" "><label for="rfq-company">Venue or company</label></div>
+      <div class="field"><input id="rfq-email" name="email" type="email" required placeholder=" "><label for="rfq-email">Work email</label></div>
+      <div class="field field--select"><select id="rfq-type" name="type"><option>Bar or restaurant</option><option>Hotel</option><option>Corporate gifting</option><option>Retail or distributor</option><option>Wedding or event</option></select><label for="rfq-type">Business type</label></div>
+      <div class="field"><textarea id="rfq-msg" name="message" rows="3" placeholder=" "></textarea><label for="rfq-msg">Glasses, quantities, dates</label></div>
+      <button class="btn btn--gold btn--full" type="submit" data-magnetic><span>Send request</span></button>
+      <p class="rfq__note">Sends from your own email app. Samples available on request.</p>
+    </form>
+  </div>
+  <div class="perks">
+    <div class="perk"><b>01</b><h4>Your logo in gold</h4><p>Upload it in the Atelier and see it on the glass before you order.</p></div>
+    <div class="perk"><b>02</b><h4>Samples first</h4><p>Hold the glass and check the weight before you commit.</p></div>
+    <div class="perk"><b>03</b><h4>Replacements</h4><p>Order single replacement pieces for your bar, any time.</p></div>
+    <div class="perk"><b>04</b><h4>Packed for service</h4><p>Divided cartons, sized to go straight onto the bar back.</p></div>
+  </div>
+</section>
+
+<!-- ============ CRAFT ============ -->
+<section id="craft" class="craft">
+  <div class="section-head">
+    <p class="eyebrow"><span class="line"></span>The craft</p>
+    <h2 class="display" data-split>From fire <em>to gold.</em></h2>
+  </div>
+  <div class="craft__wrap">
+    <svg class="craft__path" viewBox="0 0 100 400" preserveAspectRatio="none" aria-hidden="true"><path d="M50 0 C 90 60, 10 120, 50 200 S 90 340, 50 400" fill="none" stroke="url(#craftGold)" stroke-width=".6" vector-effect="non-scaling-stroke"/><defs><linearGradient id="craftGold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8a6424"/><stop offset=".5" stop-color="#f3d79a"/><stop offset="1" stop-color="#d4a24c"/></linearGradient></defs></svg>
+    <article class="step"><span class="step__n">I</span><div><h3>Gather</h3><p>Molten glass is gathered from the furnace at around 1,100&nbsp;°C. The heavy base is shaped while it still glows.</p></div></article>
+    <article class="step"><span class="step__n">II</span><div><h3>Form</h3><p>The wall is blown and turned to an even thickness, so the glass feels balanced in the hand and rings clear when it's touched.</p></div></article>
+    <article class="step"><span class="step__n">III</span><div><h3>Gild</h3><p>The rim is banded in gold, gold leaf is set into the base, and the medallion is applied by hand.</p></div></article>
+    <article class="step"><span class="step__n">IV</span><div><h3>Finish</h3><p>Every piece is inspected, polished and packed with its walnut coaster.</p></div></article>
+  </div>
+  <div class="stats">
+    <div class="stat"><strong data-count="6">0</strong><span>Medallions</span></div>
+    <div class="stat"><strong data-count="3">0</strong><span>Signature forms</span></div>
+    <div class="stat"><strong data-count="4">0</strong><span>Rim finishes</span></div>
+    <div class="stat"><strong data-count="1">0</strong><span>Signature: yours</span></div>
+  </div>
+</section>
+
+<!-- ============ RENDER / FINALE ============ -->
+<section class="finale">
+  <div class="finale__media" data-cursor="Zoom">
+    <picture>
+      <source media="(max-width: 700px)" srcset="assets/img/hero-render-portrait.jpg">
+      <img src="assets/img/hero-render.jpg" alt="AUREUM rocks glass with whisky, ice, cinnamon and rosemary on a walnut coaster, rendered in Blender" class="js-finale-img" loading="lazy">
+    </picture>
+    <span class="finale__tag">Modelled and path-traced in Blender</span>
+  </div>
+  <div class="finale__body">
+    <h2 class="display finale__title" data-split>Raise <em>a glass.</em></h2>
+    <button type="button" class="btn btn--gold btn--xl js-cheers" data-magnetic><span>Cheers</span></button>
+    <form class="newsletter js-newsletter" novalidate>
+      <label for="nl-email">First pours, new medallions and private releases.</label>
+      <div class="newsletter__row"><input id="nl-email" type="email" placeholder="Your email" required><button class="btn btn--ghost" type="submit"><span>Join the list</span></button></div>
+    </form>
+  </div>
+  <canvas class="confetti" aria-hidden="true"></canvas>
+</section>
+
+<footer class="footer">
+  <div class="footer__big" aria-hidden="true"><span>A</span><span>U</span><span>R</span><span>E</span><span>U</span><span>M</span></div>
+  <div class="footer__row">
+    <div><h5>Shop</h5><a href="#collections">Collections</a><a href="#atelier">Atelier</a><a href="#gift">Gift sets</a></div>
+    <div><h5>Trade</h5><a href="#trade">Hospitality</a><a href="#trade">Corporate gifting</a><a href="#trade">Request a quote</a></div>
+    <div><h5>Care</h5><p>Hand-wash only. Gold and dishwashers don't mix.</p></div>
+    <div><h5>Contact</h5><a class="js-contact-link" href="#">Email us</a></div>
+  </div>
+  <div class="footer__base"><span>© 2026 AUREUM</span><span>Gold, held in glass.</span><a href="#top" class="js-to-top">Back to top ↑</a></div>
+</footer>
+</main>
+
+<!-- ============ OVERLAYS ============ -->
+<aside class="cart" aria-hidden="true" aria-label="Your bag">
+  <div class="cart__scrim js-cart-close"></div>
+  <div class="cart__panel">
+    <div class="cart__head"><h3>Your bag</h3><button type="button" class="icon-btn js-cart-close" aria-label="Close bag">✕</button></div>
+    <div class="cart__items js-cart-items"></div>
+    <div class="cart__foot">
+      <div class="cart__sub"><span>Subtotal</span><strong class="js-cart-sub">₹0</strong></div>
+      <button type="button" class="btn btn--gold btn--full js-checkout"><span>Place order request</span></button>
+      <p class="cart__note">Opens your email app with the order, and we confirm availability and payment by reply.</p>
+    </div>
+  </div>
+</aside>
+
+<div class="lightbox" aria-hidden="true">
+  <div class="lightbox__stage js-lb-stage" data-cursor="Zoom"><img class="js-lb-img" alt=""></div>
+  <div class="lightbox__ui">
+    <div class="lightbox__cap"><b class="js-lb-title"></b><small class="js-lb-sub"></small></div>
+    <div class="lightbox__zoom"><button type="button" class="icon-btn js-lb-out" aria-label="Zoom out">−</button><span class="js-lb-pct">100%</span><button type="button" class="icon-btn js-lb-in" aria-label="Zoom in">+</button></div>
+    <button type="button" class="icon-btn js-lb-close" aria-label="Close">✕</button>
+  </div>
+  <p class="lightbox__hint">Scroll or pinch to zoom · drag to pan</p>
+</div>
+
+<div class="ar-modal" aria-hidden="true">
+  <div class="ar-modal__panel">
+    <button type="button" class="icon-btn js-ar-close" aria-label="Close">✕</button>
+    <div class="ar-modal__view js-ar-view"></div>
+    <p class="ar-modal__hint">On a phone, tap <b>View in your space</b> to place the glass on your table. On a laptop, drag to inspect it.</p>
+  </div>
+</div>
+
+<div class="toasts" aria-live="polite"></div>
+
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
