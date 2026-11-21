@@ -16,7 +16,7 @@ const fmt = (n) => '₹' + Math.round(n).toLocaleString('en-IN');
 const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const sized = (src, w) => (src ? src + (src.includes('?') ? '&' : '?') + 'width=' + w : '');
 const mrp = (p) => p.compare || Math.ceil(p.price / 0.7 / 5) * 5;
-const off = (p) => Math.round((1 - p.price / mrp(p)) * 100);
+const off = (p) => Math.floor((1 - p.price / mrp(p)) * 100 + 1e-9);
 const priceHTML = (p) => (mrp(p) > p.price ? `<s>${fmt(mrp(p))}</s><b>${fmt(p.price)}</b><i>-${off(p)}%</i>` : `<b>${fmt(p.price)}</b>`);
 const desc = (p) => [p.code, p.meta].filter(Boolean).join(' · ');
 

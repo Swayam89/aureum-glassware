@@ -401,3 +401,6 @@ body.search-open .search__panel { transform: none; }
 .card__img { display: block; }
 .card__body h3 a:hover { text-decoration: underline; }
 .shopify-section { display: contents; }
+.story__media img { height: auto; }
+.hero__media img { height: auto; }
+.tile img { height: 100%; }
