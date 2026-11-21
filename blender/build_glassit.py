@@ -22,7 +22,7 @@ scene = bpy.context.scene
 
 
 # ------------------------------------------------------------ medallion crops
-def crop(name, src, cx, cy, rad, size=512):
+def crop(name, src, cx, cy, rad, size=1024):
     import numpy as np
     img = bpy.data.images.load(os.path.join(CAT, src), check_existing=True)
     w, h = img.size
@@ -35,6 +35,17 @@ def crop(name, src, cx, cy, rad, size=512):
     o = (px[y0, x0] * (1 - fx) + px[y0, x0 + 1] * fx) * (1 - fy) + (px[y0 + 1, x0] * (1 - fx) + px[y0 + 1, x0 + 1] * fx) * fy
     U, V = np.meshgrid(t * 2 - 1, t * 2 - 1)
     o[..., 3] = np.clip((1 - np.sqrt(U * U + V * V)) * size * 0.25, 0, 1)
+    # relief normal map from luminance (embossed gold catches the light)
+    lum = o[..., 0] * 0.3 + o[..., 1] * 0.59 + o[..., 2] * 0.11
+    for _ in range(2):
+        lum = (lum * 2 + np.roll(lum, 1, 0) + np.roll(lum, -1, 0) + np.roll(lum, 1, 1) + np.roll(lum, -1, 1)) / 6
+    gx = np.roll(lum, -1, 1) - np.roll(lum, 1, 1); gy = np.roll(lum, -1, 0) - np.roll(lum, 1, 0)
+    st = 9.0
+    n = np.stack([-gx * st, gy * st, np.ones_like(lum)], -1); n /= np.linalg.norm(n, axis=-1, keepdims=True)
+    nm = np.concatenate([n * 0.5 + 0.5, np.ones_like(lum)[..., None]], -1)[::-1].copy()
+    nim = bpy.data.images.new("nrm_" + name, size, size, alpha=False)
+    nim.pixels.foreach_set(nm.ravel().astype(np.float32))
+    nim.filepath_raw = os.path.join(OUT, f"medallion-{name}-normal.png"); nim.file_format = "PNG"; nim.save()
     o = o[::-1].copy()
     im = bpy.data.images.new("med_" + name, size, size, alpha=True)
     im.pixels.foreach_set(o.ravel().astype(np.float32))
@@ -205,7 +216,7 @@ products, profiles = {}, {}
 R1 = spline([(0, 0.0395), (0.05, 0.0402), (0.092, 0.0408)])
 p, liq = vessel(R1, 0.092, 0.004, 0.024, floor=[(0.0, 0.034), (0.012, 0.029), (0.024, 0.0255), (0.032, 0.0245)])
 g = lathe("tiger_Glass", p)
-products["tiger"] = [g] + medallion("tiger", R1, 0.052, 0.0215)
+products["tiger"] = [g] + medallion("tiger", R1, 0.053, 0.0232)
 profiles["tiger"] = dict(height=0.092, inner=liq)
 
 # 2. Peacock Medallion Tumbler (SWG0377D-G): stemless, wide low belly
@@ -227,7 +238,7 @@ R5 = spline([(0, 0.0365), (0.06, 0.0372), (0.17, 0.0385)])
 facet = lambda a, z: 1.0 + (0.035 * abs(math.cos(6 * a)) - 0.02) * max(0.0, 1 - z / 0.055)
 p, liq = vessel(R5, 0.17, 0.0042, 0.026, rib=facet)
 g5 = lathe("lion_Glass", p, 144, rib=facet)
-products["lion"] = [g5, handle("lion", R5(0.1), 0.15, 0.045, 0.04)] + medallion("lion", R5, 0.098, 0.0245)
+products["lion"] = [g5, handle("lion", R5(0.1), 0.15, 0.045, 0.04)] + medallion("lion", R5, 0.092, 0.027)
 profiles["lion"] = dict(height=0.17, inner=liq)
 
 # 6. Amber Ribbed Cylinder Dispenser (MS-630-G): ribbed body, copper lid & tap, gold stand

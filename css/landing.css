@@ -365,33 +365,6 @@ body.search-open .search__panel { transform: none; }
   .hero h1 { margin-bottom: 14px; }
   .hero__lede { margin-bottom: 22px; }
 }
-
-/* ---------- featured carousel: real photos in 3D ---------- */
-.turn__stage { cursor: grab; user-select: none; -webkit-user-select: none; }
-.flow { position: absolute; inset: 0; perspective: 1500px; perspective-origin: 50% 40%; overflow: hidden; }
-.flow__card {
-  position: absolute; left: 50%; top: 45%; margin: 0;
-  width: clamp(220px, min(30vw, 44vh), 400px); aspect-ratio: 9 / 10;
-  transform-style: preserve-3d; will-change: transform, opacity; cursor: pointer;
-  filter: brightness(var(--dim, 1));
-  -webkit-box-reflect: below 12px linear-gradient(transparent 74%, rgba(255, 255, 255, .2));
-}
-.flow__img {
-  width: 100%; height: 100%; overflow: hidden; border-radius: 4px; background: var(--sand);
-  box-shadow: 0 34px 60px -24px rgba(70, 48, 26, .45), 0 2px 6px rgba(70, 48, 26, .08);
-  transform: rotateX(var(--tx, 0deg)) rotateY(var(--ty, 0deg)); transition: transform .5s var(--ease);
-}
-.flow__img img { width: 100%; height: 100%; object-fit: cover; transform-origin: var(--ox, 50%) var(--oy, 50%); transition: transform .5s var(--ease); pointer-events: none; }
-.flow__card.is-active.zoom .flow__img img { transform: scale(2); }
-.flow__card.is-active { cursor: zoom-in; }
-.flow__card.is-active.zoom { cursor: zoom-out; }
-.flow__gloss { position: absolute; inset: 0; border-radius: 4px; pointer-events: none; background: radial-gradient(circle at var(--gx, 50%) var(--gy, 25%), rgba(255, 255, 255, .45), transparent 55%); mix-blend-mode: soft-light; opacity: 0; transition: opacity .4s; }
-.flow__card.is-active:hover .flow__gloss { opacity: 1; }
-.flow__zoom { position: absolute; left: 50%; bottom: 12px; transform: translateX(-50%); font-size: 10px; letter-spacing: .16em; text-transform: uppercase; padding: 6px 12px; border-radius: 999px; background: rgba(251, 248, 244, .9); color: var(--ink); opacity: 0; transition: opacity .4s; pointer-events: none; white-space: nowrap; }
-.flow__card.is-active .flow__zoom { opacity: 1; }
-.flow__card.is-active.zoom .flow__zoom { opacity: 0; }
-@media (max-width: 980px) {
-  .flow__card { width: min(62vw, 46vh); top: 44%; }
-  .flow { perspective: 1100px; }
-}
 .hide-shopbar .shopbar { transform: translateY(150%); }
+/* blend the 3D studio backdrop into the section */
+#turn-canvas { -webkit-mask-image: radial-gradient(120% 95% at 50% 45%, #000 62%, transparent 100%); mask-image: radial-gradient(120% 95% at 50% 45%, #000 62%, transparent 100%); }

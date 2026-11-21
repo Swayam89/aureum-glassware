@@ -228,132 +228,69 @@ const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersec
 $$('.section-head, .story__copy, .story__media, .trade__inner, .value, .reel, .tile').forEach((el) => { el.classList.add('rv'); io.observe(el); });
 new IntersectionObserver(([e]) => $('.shopbar').classList.toggle('on', !e.isIntersecting && !document.body.classList.contains('at-shop')), { threshold: 0 }).observe($('.hero__ctas'));
 
-/* ---------------- 4 · featured carousel (real product photos in 3D space) ---------------- */
-const FLOW = [
-  'smoke-tiger-whisky-glass-set', 'peacock-medallion-tumbler-set', 'two-tone-round-wine-glass',
-  'gold-lion-beer-mug-set', 'diamond-cut-coupe-set', 'cut-base-tiger-whisky-glass-set',
-  'amber-ribbed-cylinder-dispenser', 'angular-flute-set', 'sunburst-base-peacock-whisky-glass-set',
-].filter((id) => byId[id]);
-
-function initFlow() {
-  const N = FLOW.length, stage = $('.js-flow'), info = $('.js-turn-info'), dots = $('.js-dots');
-  const touch = matchMedia('(hover: none)').matches;
-  stage.innerHTML = FLOW.map((id, i) => `<figure class="flow__card" data-i="${i}">
-      <div class="flow__img"><img src="${byId[id].image}" alt="${esc(byId[id].name)}" draggable="false"${i > 3 ? ' loading="lazy"' : ''}></div>
-      <span class="flow__gloss"></span><span class="flow__zoom">${touch ? 'Tap to zoom' : 'Hover to zoom'}</span>
-    </figure>`).join('');
-  const cards = $$('.flow__card', stage);
-  dots.innerHTML = FLOW.map((id, i) => `<button type="button" aria-label="${esc(byId[id].name)}" data-i="${i}"></button>`).join('');
-  let index = 0, cur = 0, dragOff = 0, drag = null, visible = true, gap = 200;
-
+/* ---------------- 4 · 3D carousel ---------------- */
+async function initTurn() {
+  const { Turntable, TURN } = await import('./turntable.js?v=12');
+  const N = TURN.length;
+  const info = $('.js-turn-info');
+  let current = 0;
+  const dots = $('.js-dots');
+  dots.innerHTML = TURN.map((d, i) => `<button type="button" aria-label="${esc(byId[d.id].name)}" data-i="${i}"></button>`).join('');
   const show = (i) => {
-    const p = byId[FLOW[i]];
+    current = i;
+    const p = byId[TURN[i].id];
     $('.js-t-cat').textContent = p.category; $('.js-t-name').textContent = p.name; $('.js-t-desc').textContent = desc(p);
     $('.js-t-price').innerHTML = priceHTML(p);
     info.classList.remove('swap'); void info.offsetWidth; info.classList.add('swap');
     $$('button', dots).forEach((b, j) => b.classList.toggle('on', j === i));
-    cards.forEach((c) => c.classList.remove('zoom'));
   };
-  const setIndex = (i) => { i = Math.max(0, Math.min(N - 1, i)); if (i !== index) { index = i; show(i); } };
+  const tt = new Turntable($('#turn-canvas'), { onChange: (i) => show(i) });
   show(0);
+  await tt.load();
+  $('.js-turn-loading').classList.add('done');
 
-  // scrolling through the pinned section moves through the products
+  // scroll drives the carousel while the section is pinned
   const st = ScrollTrigger.create({
-    trigger: '.turn', start: 'top top', end: () => '+=' + innerHeight * 0.45 * (N - 1), pin: '.turn__pin', pinSpacing: true,
+    trigger: '.turn', start: 'top top', end: () => '+=' + innerHeight * 0.55 * (N - 1), pin: '.turn__pin', pinSpacing: true,
     snap: { snapTo: 1 / (N - 1), duration: { min: 0.2, max: 0.6 }, ease: 'power2.inOut', delay: 0.05 },
-    onUpdate: (s) => { if (!drag) setIndex(Math.round(s.progress * (N - 1))); },
+    onUpdate: (s) => { const i = Math.round(s.progress * (N - 1)); if (i !== tt.index) tt.go(i); },
   });
   const goto = (i) => {
     i = Math.max(0, Math.min(N - 1, i));
     const y = st.start + (st.end - st.start) * (i / (N - 1));
-    if (scrollY < st.start - 2 || scrollY > st.end + 2) { setIndex(i); return; }
-    setIndex(i); scrollToEl(y);
+    if (scrollY < st.start - 2 || scrollY > st.end + 2) { tt.go(i); return; }
+    scrollToEl(y);
   };
-  $('.js-prev').addEventListener('click', () => goto(index - 1));
-  $('.js-next').addEventListener('click', () => goto(index + 1));
+  $('.js-prev').addEventListener('click', () => goto(tt.index - 1));
+  $('.js-next').addEventListener('click', () => goto(tt.index + 1));
   dots.addEventListener('click', (e) => { const b = e.target.closest('[data-i]'); if (b) goto(+b.dataset.i); });
+  // quick horizontal swipe on the stage moves to the next/previous product
+  let sw = null;
+  $('#turn-canvas').addEventListener('pointerdown', (e) => { sw = { x: e.clientX, y: e.clientY, t: performance.now() }; });
+  $('#turn-canvas').addEventListener('pointerup', (e) => {
+    if (!sw) return;
+    const dx = e.clientX - sw.x, dy = e.clientY - sw.y, dt = performance.now() - sw.t; sw = null;
+    if (dt < 350 && Math.abs(dx) > 70 && Math.abs(dx) > Math.abs(dy) * 1.5) goto(tt.index + (dx < 0 ? 1 : -1));
+  });
   addEventListener('keydown', (e) => {
     const r = $('.turn').getBoundingClientRect();
     if (r.top > innerHeight * 0.5 || r.bottom < innerHeight * 0.5) return;
-    if (e.key === 'ArrowRight') goto(index + 1);
-    if (e.key === 'ArrowLeft') goto(index - 1);
+    if (e.key === 'ArrowRight') goto(tt.index + 1);
+    if (e.key === 'ArrowLeft') goto(tt.index - 1);
   });
+  $('.js-t-add').addEventListener('click', () => addToBag(TURN[current].id, null));
+  $('.js-t-shop').addEventListener('click', () => setTimeout(() => highlight(TURN[current].id), 60));
 
-  // drag / swipe
-  stage.addEventListener('pointerdown', (e) => { drag = { x: e.clientX, y: e.clientY, moved: false, horiz: null }; });
-  addEventListener('pointermove', (e) => {
-    if (!drag) return;
-    const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
-    if (drag.horiz === null && Math.hypot(dx, dy) > 8) drag.horiz = Math.abs(dx) > Math.abs(dy);
-    if (drag.horiz) { drag.moved = true; dragOff = dx / gap; }
-  });
-  const endDrag = () => {
-    if (!drag) return;
-    const moved = drag.moved; drag = null;
-    if (moved) { const dest = Math.round(index - dragOff * 1.2); dragOff = 0; goto(dest); }
-  };
-  addEventListener('pointerup', endDrag); addEventListener('pointercancel', () => { drag = null; dragOff = 0; });
-
-  // click: side card -> bring forward; active card -> zoom (touch) ; hover zoom + gloss on desktop
-  cards.forEach((c, i) => {
-    const img = $('img', c);
-    c.addEventListener('click', (e) => {
-      if (Math.abs(dragOff) > 0.05) return;
-      if (i !== index) { goto(i); return; }
-      if (touch) {
-        const r = c.getBoundingClientRect();
-        img.style.setProperty('--ox', `${((e.clientX - r.left) / r.width) * 100}%`);
-        img.style.setProperty('--oy', `${((e.clientY - r.top) / r.height) * 100}%`);
-        c.classList.toggle('zoom');
-      }
-    });
-    if (!touch) {
-      c.addEventListener('pointermove', (e) => {
-        if (i !== index || drag?.moved) return;
-        const r = c.getBoundingClientRect(), x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
-        img.style.setProperty('--ox', `${x * 100}%`); img.style.setProperty('--oy', `${y * 100}%`);
-        c.style.setProperty('--gx', `${x * 100}%`); c.style.setProperty('--gy', `${y * 100}%`);
-        c.style.setProperty('--tx', `${(0.5 - y) * 6}deg`); c.style.setProperty('--ty', `${(x - 0.5) * 8}deg`);
-        c.classList.add('zoom');
-      });
-      c.addEventListener('pointerleave', () => { c.classList.remove('zoom'); c.style.setProperty('--tx', '0deg'); c.style.setProperty('--ty', '0deg'); });
-    }
-  });
-
-  $('.js-t-add').addEventListener('click', () => addToBag(FLOW[index], $('img', cards[index])));
-  $('.js-t-shop').addEventListener('click', () => setTimeout(() => highlight(FLOW[index]), 60));
-
-  // 3D layout, eased every frame
-  new IntersectionObserver(([e]) => { visible = e.isIntersecting; }).observe(stage);
-  const layout = () => {
-    const w = stage.clientWidth, cw = cards[0].offsetWidth || 300;
-    gap = Math.min(cw * 0.78, w * 0.3);
-    cards.forEach((c, i) => {
-      const o = i - cur, a = Math.abs(o), s = Math.sign(o);
-      const x = s * (a < 1 ? a * gap : gap + (a - 1) * gap * 0.55);
-      const ry = -s * Math.min(a, 1) * 45;
-      const z = -Math.min(a, 4) * 190;
-      const op = a > 3 ? Math.max(0, 1 - (a - 3) * 1.5) : 1;
-      c.style.transform = `translate(-50%, -50%) translate3d(${x.toFixed(1)}px, 0, ${z.toFixed(1)}px) rotateY(${ry.toFixed(2)}deg)`;
-      c.style.zIndex = String(100 - Math.round(a * 10));
-      c.style.opacity = op.toFixed(3);
-      c.style.setProperty('--dim', (1 - Math.min(a, 3) * 0.07).toFixed(3));
-      c.classList.toggle('is-active', a < 0.5);
-      c.style.visibility = op <= 0.01 ? 'hidden' : 'visible';
-    });
-  };
   let last = performance.now();
   gsap.ticker.add(() => {
     const now = performance.now(), dt = Math.min(0.05, (now - last) / 1000); last = now;
-    if (!visible) return;
-    const target = index - dragOff;
-    cur += (target - cur) * (1 - Math.exp(-dt * (drag ? 18 : 7)));
-    layout();
+    if (!document.hidden) tt.tick(dt, now / 1000);
   });
-  layout();
-  window.__glassit = { st, lenis, get index() { return index; } };
+  window.__glassit = { tt, st, lenis };
 }
-initFlow();
+function webgl() { try { const c = document.createElement('canvas'); return !!(c.getContext('webgl2') || c.getContext('webgl')); } catch { return false; } }
+if (webgl()) initTurn().catch((err) => { console.error(err); $('.js-turn-loading').innerHTML = 'The 3D view could not load on this device.'; });
+else $('.js-turn-loading').innerHTML = 'The 3D view needs WebGL.';
 
 // keep the sticky shop bar from covering the carousel's buttons
 new IntersectionObserver(([e]) => document.body.classList.toggle('hide-shopbar', e.isIntersecting)).observe($('.turn__buy'));
