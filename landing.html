@@ -9,17 +9,13 @@
 <meta property="og:title" content="Glassit — The Perfect Host">
 <meta property="og:description" content="Luxury glassware for home and hospitality. 30% off for launch.">
 <meta property="og:image" content="assets/glassit/hero-cover.jpg">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231d1a17'/%3E%3Ctext x='32' y='44' text-anchor='middle' font-family='Georgia' font-size='34' fill='%23f6f2ec'%3EG%3C/text%3E%3C/svg%3E">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/brand/favicon-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="assets/brand/favicon-192.png">
+<link rel="apple-touch-icon" sizes="180x180" href="assets/brand/favicon-180.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Cormorant+Garamond:wght@400;500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/landing.css?v=4">
-<script type="importmap">
-{ "imports": {
-  "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
-  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
-} }
-</script>
+<link rel="stylesheet" href="css/landing.css?v=6">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
 <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js" defer></script>
@@ -104,13 +100,12 @@
 <section class="turn" id="turn">
   <div class="turn__pin">
     <div class="turn__head">
-      <p class="eyebrow">In the round</p>
-      <h2>Turn it over <em>before you buy.</em></h2>
-      <p class="turn__hint"><span class="hint-desk">Scroll or use the arrows to move · drag a glass to turn it</span><span class="hint-touch">Swipe to move · drag a glass to turn it</span></p>
+      <p class="eyebrow">Featured pieces</p>
+      <h2>Every piece, <em>up close.</em></h2>
+      <p class="turn__hint"><span class="hint-desk">Scroll, drag or use the arrows · hover a photo to zoom in</span><span class="hint-touch">Swipe to browse · tap a photo to zoom in</span></p>
     </div>
-    <div class="turn__stage" data-cursor="Drag">
-      <canvas id="turn-canvas" aria-label="3D product carousel"></canvas>
-      <div class="turn__loading js-turn-loading"><span></span>Loading 3D</div>
+    <div class="turn__stage">
+      <div class="flow js-flow" aria-label="Featured products"></div>
       <button class="turn__arrow turn__arrow--prev js-prev" type="button" aria-label="Previous product"><svg viewBox="0 0 24 24"><path d="M15 5 8 12l7 7"/></svg></button>
       <button class="turn__arrow turn__arrow--next js-next" type="button" aria-label="Next product"><svg viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></svg></button>
     </div>
@@ -264,6 +259,6 @@
 
 <div class="toasts" aria-live="polite"></div>
 
-<script type="module" src="js/landing.js?v=3"></script>
+<script type="module" src="js/landing.js?v=6"></script>
 </body>
 </html>
