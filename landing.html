@@ -15,7 +15,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Cormorant+Garamond:wght@400;500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/landing.css?v=13">
+<link rel="stylesheet" href="css/landing.css?v=17">
 <script type="importmap">
 { "imports": {
   "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
@@ -52,7 +52,7 @@
     <button class="icon js-search-open" type="button" aria-label="Search">
       <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></svg>
     </button>
-    <button class="icon bag-btn js-bag-open" type="button" aria-label="Open bag">
+    <button class="icon bag-btn js-bag-open" type="button" aria-label="Open cart">
       <svg viewBox="0 0 24 24"><path d="M5.5 8h13l-1 12.2a1 1 0 0 1-1 .8H7.5a1 1 0 0 1-1-.8L5.5 8Z"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8"/></svg>
       <span class="bag-btn__n js-bag-count">0</span>
     </button>
@@ -125,6 +125,7 @@
       <div class="turn__buy">
         <span class="price price--lg js-t-price"></span>
         <div class="turn__btns">
+          <button class="btn btn--line js-t-cart" type="button">Add to cart</button>
           <button class="btn btn--dark js-t-shop" type="button">Shop now</button>
         </div>
       </div>
@@ -239,11 +240,11 @@
 <!-- sticky mobile shop bar -->
 <a class="shopbar" href="#shop"><span>30% off everything</span><b>Shop now</b></a>
 
-<!-- bag drawer -->
-<aside class="bag" aria-hidden="true" aria-label="Your bag">
+<!-- cart drawer -->
+<aside class="bag" aria-hidden="true" aria-label="Your cart">
   <div class="bag__scrim js-bag-close"></div>
   <div class="bag__panel">
-    <div class="bag__head"><h3>Your bag</h3><button class="icon js-bag-close" type="button" aria-label="Close bag">✕</button></div>
+    <div class="bag__head"><h3>Your cart</h3><button class="icon js-bag-close" type="button" aria-label="Close cart">✕</button></div>
     <div class="bag__items js-bag-items"></div>
     <div class="bag__foot">
       <div class="bag__row"><span>You save</span><b class="js-bag-save">₹0</b></div>
@@ -265,6 +266,6 @@
 
 <div class="toasts" aria-live="polite"></div>
 
-<script type="module" src="js/landing.js?v=15"></script>
+<script type="module" src="js/landing.js?v=16"></script>
 </body>
 </html>

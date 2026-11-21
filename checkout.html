@@ -12,12 +12,12 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Cormorant+Garamond:wght@400;500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/landing.css?v=13">
-<link rel="stylesheet" href="css/checkout.css?v=1">
+<link rel="stylesheet" href="css/landing.css?v=17">
+<link rel="stylesheet" href="css/checkout.css?v=2">
 </head>
 <body class="co">
 
-<div class="ticker ticker--static" role="note"><span><b>Launch sale: 30% off</b> already applied to every piece in your bag</span></div>
+<div class="ticker ticker--static" role="note"><span><b>Launch sale: 30% off</b> already applied to every piece in your cart</span></div>
 
 <header class="co-head">
   <a class="co-back" href="landing.html#shop"><svg viewBox="0 0 24 24"><path d="M15 5 8 12l7 7"/></svg><span>Continue shopping</span></a>
@@ -26,7 +26,7 @@
 </header>
 
 <ol class="co-steps" aria-label="Checkout steps">
-  <li class="done">Bag</li><li class="on">Details</li><li class="js-step-pay">Payment</li><li class="js-step-done">Confirmation</li>
+  <li class="done">Cart</li><li class="on">Details</li><li class="js-step-pay">Payment</li><li class="js-step-done">Confirmation</li>
 </ol>
 
 <main class="co-main js-co">
@@ -87,7 +87,7 @@
 </main>
 
 <section class="co-empty js-empty" hidden>
-  <h1>Your bag is empty</h1>
+  <h1>Your cart is empty</h1>
   <p>Choose a piece and press <b>Shop now</b> to come back here.</p>
   <a class="btn btn--dark" href="landing.html#shop">Browse the collection</a>
 </section>
@@ -104,6 +104,6 @@
 </section>
 
 <div class="toasts" aria-live="polite"></div>
-<script type="module" src="js/checkout.js?v=1"></script>
+<script type="module" src="js/checkout.js?v=2"></script>
 </body>
 </html>

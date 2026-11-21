@@ -94,9 +94,9 @@ function setFilter(cat, animate) {
 }
 function cardHTML(p, i) {
   return `<article class="card enter" style="animation-delay:${(i % 8) * 50}ms" data-id="${p.id}">
-    <div class="card__img"><img src="${p.image}" alt="${esc(p.name)}" loading="lazy" width="808" height="900"><span class="card__badge">-30%</span>
-      <button class="card__add" type="button" data-add="${p.id}">Shop now</button></div>
-    <div class="card__body"><h3>${esc(p.name)}</h3><small>${esc(desc(p))}</small><span class="price">${priceHTML(p)}</span></div>
+    <div class="card__img"><img src="${p.image}" alt="${esc(p.name)}" loading="lazy" width="808" height="900"><span class="card__badge">-30%</span></div>
+    <div class="card__body"><h3>${esc(p.name)}</h3><small>${esc(desc(p))}</small><span class="price">${priceHTML(p)}</span>
+      <div class="card__btns"><button class="btn btn--line" type="button" data-cart="${p.id}">Add to cart</button><button class="btn btn--dark" type="button" data-buy="${p.id}">Shop now</button></div></div>
   </article>`;
 }
 function renderGrid() {
@@ -113,8 +113,9 @@ $('.js-more').addEventListener('click', () => {
   ScrollTrigger.refresh();
 });
 grid.addEventListener('click', (e) => {
-  const b = e.target.closest('[data-add]'); if (!b) return;
-  shopNow(b.dataset.add);
+  const c = e.target.closest('[data-cart]'), b = e.target.closest('[data-buy]');
+  if (c) addToBag(c.dataset.cart, c.closest('.card').querySelector('img'));
+  if (b) shopNow(b.dataset.buy);
 });
 function highlight(id) {
   const p = byId[id]; if (!p) return;
@@ -145,13 +146,11 @@ function addToBag(id, fromImg) {
   l ? l.qty++ : bag.push({ id, qty: 1 });
   saveBag(); renderBag();
   if (fromImg) fly(fromImg);
-  toast(`${byId[id].name} added to your bag`);
+  toast(`${byId[id].name} added to your cart`);
 }
-// "Shop now": put the piece in the bag (once) and go straight to checkout
+// "Shop now": straight to checkout with only this product (like "Buy now")
 function shopNow(id) {
-  if (!bag.find((x) => x.id === id)) bag.push({ id, qty: 1 });
-  saveBag();
-  location.href = 'checkout.html';
+  location.href = 'checkout.html?buy=' + encodeURIComponent(id); // checks out just this piece; the cart is left alone
 }
 function fly(img) {
   const a = img.getBoundingClientRect(), b = $('.js-bag-open').getBoundingClientRect();
@@ -175,7 +174,7 @@ function renderBag() {
     return `<div class="line"><img src="${p.image}" alt=""><div><b>${esc(p.name)}</b><small>${esc(desc(p))}</small>
       <div class="qty"><button type="button" data-q="-1" data-i="${i}" aria-label="Fewer">−</button><span>${l.qty}</span><button type="button" data-q="1" data-i="${i}" aria-label="More">+</button></div></div>
       <div class="line__right"><span class="price"><s>${fmt(mrp(p) * l.qty)}</s><b>${fmt(p.price * l.qty)}</b></span><button class="line__rm" type="button" data-rm="${i}">Remove</button></div></div>`;
-  }).join('') : '<div class="bag__empty"><b>Your bag is empty</b>Add a few pieces from the collection.</div>';
+  }).join('') : '<div class="bag__empty"><b>Your cart is empty</b>Add a few pieces from the collection.</div>';
 }
 $('.js-bag-items').addEventListener('click', (e) => {
   const q = e.target.closest('[data-q]'), rm = e.target.closest('[data-rm]');
@@ -257,6 +256,7 @@ async function initTurn() {
     if (e.key === 'ArrowRight') tt.next();
     if (e.key === 'ArrowLeft') tt.prev();
   });
+  $('.js-t-cart').addEventListener('click', () => addToBag(TURN[current].id, null));
   $('.js-t-shop').addEventListener('click', () => shopNow(TURN[current].id));
 
   let last = performance.now();

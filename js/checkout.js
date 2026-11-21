@@ -13,7 +13,10 @@ const desc = (p) => [p.code, p.meta].filter(Boolean).join(' · ');
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const store = { get(k, d) { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch { return d; } }, set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch { /* blocked */ } } };
 
-let bag = store.get(BAG_KEY, []).filter((l) => byId[l.id]);
+const buyId = new URLSearchParams(location.search).get('buy');
+const BUY_NOW = !!(buyId && byId[buyId]);           // "Shop now": just this product, cart untouched
+let bag = BUY_NOW ? [{ id: buyId, qty: 1 }] : store.get(BAG_KEY, []).filter((l) => byId[l.id]);
+const saveBag = () => { if (!BUY_NOW) store.set(BAG_KEY, bag); };
 const STATES = ['Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh', 'Goa', 'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jharkhand', 'Karnataka', 'Kerala', 'Madhya Pradesh', 'Maharashtra', 'Manipur', 'Meghalaya', 'Mizoram', 'Nagaland', 'Odisha', 'Punjab', 'Rajasthan', 'Sikkim', 'Tamil Nadu', 'Telangana', 'Tripura', 'Uttar Pradesh', 'Uttarakhand', 'West Bengal', 'Andaman and Nicobar Islands', 'Chandigarh', 'Dadra and Nagar Haveli and Daman and Diu', 'Delhi', 'Jammu and Kashmir', 'Ladakh', 'Lakshadweep', 'Puducherry'];
 $('.js-states').innerHTML = '<option value="" disabled selected></option>' + STATES.map((s) => `<option>${s}</option>`).join('');
 
@@ -47,7 +50,7 @@ $('.js-items').addEventListener('click', (e) => {
   const q = e.target.closest('[data-q]'), rm = e.target.closest('[data-rm]');
   if (q) { const l = bag[+q.dataset.i]; l.qty = Math.max(1, l.qty + +q.dataset.q); }
   if (rm) bag.splice(+rm.dataset.rm, 1);
-  if (q || rm) { store.set(BAG_KEY, bag); render(); }
+  if (q || rm) { saveBag(); render(); }
 });
 
 // remember what the visitor typed (this browser only)
@@ -93,7 +96,7 @@ form.addEventListener('submit', (e) => {
   lastOrder = { id, subject: `New order ${id} — ${d.name}`, body };
   const orders = store.get(ORDERS_KEY, []); orders.push({ id, at: new Date().toISOString(), items: bag, total: T.sub, payment: d.payment }); store.set(ORDERS_KEY, orders);
   send();
-  bag = []; store.set(BAG_KEY, bag);
+  bag = []; saveBag();
   $('.js-oid').textContent = id; $('.js-oname').textContent = d.name.split(' ')[0];
   $('.js-co').hidden = true; $('.js-done').hidden = false;
   $$('.co-steps li').forEach((li) => { li.classList.remove('on'); li.classList.add('done'); });
@@ -106,3 +109,4 @@ function send() {
 }
 $('.js-resend').addEventListener('click', send);
 render();
+if (BUY_NOW) { const n = document.createElement('p'); n.className = 'co-mode'; n.textContent = 'Buying this piece only. Anything in your cart stays there.'; document.querySelector('.co-sum__head').after(n); }

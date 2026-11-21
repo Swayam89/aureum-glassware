@@ -384,3 +384,15 @@ body.search-open .search__panel { transform: none; }
 @media (max-width: 980px) { .turn { min-height: 600px; } .turn__info { padding-top: 40px; } }
 
 .turn { background: #d9ccb8; }
+
+/* product cards: Add to cart above Shop now */
+.card__btns { display: grid; gap: 6px; margin-top: 12px; }
+.card__btns .btn { height: 42px; width: 100%; padding: 0 12px; font-size: 11px; letter-spacing: .14em; }
+.turn__btns .btn { min-width: 150px; }
+@media (max-width: 980px) {
+  .card__btns .btn { height: 40px; font-size: 10px; letter-spacing: .1em; }
+  .turn__btns .btn { min-width: 0; }
+}
+/* keep the two buttons level across a row, whatever the name length */
+.card__body { display: flex; flex-direction: column; flex: 1; gap: 3px; }
+.card__btns { margin-top: auto; padding-top: 12px; }
