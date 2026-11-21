@@ -15,7 +15,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Cormorant+Garamond:wght@400;500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/landing.css?v=8">
+<link rel="stylesheet" href="css/landing.css?v=13">
 <script type="importmap">
 { "imports": {
   "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
@@ -108,7 +108,7 @@
     <div class="turn__head">
       <p class="eyebrow">In the round</p>
       <h2>Turn it over <em>before you buy.</em></h2>
-      <p class="turn__hint"><span class="hint-desk">Scroll or use the arrows to move · drag a glass to turn it</span><span class="hint-touch">Swipe to move · drag a glass to turn it</span></p>
+      <p class="turn__hint"><span class="hint-desk">Drag sideways or use the arrows to browse · drag a glass to turn it</span><span class="hint-touch">Swipe to browse · drag a glass to turn it</span></p>
     </div>
     <div class="turn__stage" data-cursor="Drag">
       <canvas id="turn-canvas" aria-label="3D product carousel"></canvas>
@@ -125,8 +125,7 @@
       <div class="turn__buy">
         <span class="price price--lg js-t-price"></span>
         <div class="turn__btns">
-          <button class="btn btn--dark js-t-add" type="button">Add to bag</button>
-          <a class="btn btn--line js-t-shop" href="#shop">Shop now</a>
+          <button class="btn btn--dark js-t-shop" type="button">Shop now</button>
         </div>
       </div>
       <div class="turn__dots js-dots" role="tablist" aria-label="Products"></div>
@@ -249,8 +248,8 @@
     <div class="bag__foot">
       <div class="bag__row"><span>You save</span><b class="js-bag-save">₹0</b></div>
       <div class="bag__row bag__row--total"><span>Subtotal</span><b class="js-bag-sub">₹0</b></div>
-      <button class="btn btn--dark btn--block js-checkout" type="button">Place order request</button>
-      <p class="bag__note">Opens your email app with the order. We confirm stock, delivery and payment by reply.</p>
+      <button class="btn btn--dark btn--block js-checkout" type="button">Checkout</button>
+      <p class="bag__note">Prices include the 30% launch discount.</p>
     </div>
   </div>
 </aside>
@@ -266,6 +265,6 @@
 
 <div class="toasts" aria-live="polite"></div>
 
-<script type="module" src="js/landing.js?v=12"></script>
+<script type="module" src="js/landing.js?v=15"></script>
 </body>
 </html>

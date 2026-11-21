@@ -1,12 +1,12 @@
-// Live 3D carousel: Blender-built catalogue products lit by a path-traced studio light map,
-// standing on travertine blocks with baked contact shadows, on one turning ring.
+// Live 3D gallery: Blender-built catalogue products on travertine pedestals in a plaster
+// boutique set (curved backdrop, arched niches, stone floor), lit by a path-traced studio
+// light map. Swipe / drag / arrows move the ring; dragging a glass turns it. Not scroll-driven.
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { RectAreaLightUniformsLib } from 'three/addons/lights/RectAreaLightUniformsLib.js';
 
-// glass: surface tint, absorption colour + distance (scene units)
 export const TURN = [
   { key: 'tiger', id: 'smoke-tiger-whisky-glass-set', h: 1.0, glass: { color: 0xb3b7bc, atten: 0x6a6e75, dist: 0.18 }, med: { metal: 1, rough: 0.24, normal: 1.4 }, drink: { color: 0xffd7a3, atten: 0xc0651a, dist: 0.6, level: 0.42 } },
   { key: 'peacock', id: 'peacock-medallion-tumbler-set', h: 1.0, glass: { color: 0xffc677, atten: 0xd27a22, dist: 0.18 }, med: { metal: 0, rough: 0.3, normal: 0.35 } },
@@ -16,18 +16,46 @@ export const TURN = [
   { key: 'dispenser', id: 'amber-ribbed-cylinder-dispenser', h: 1.9, glass: { color: 0xf3a648, atten: 0xb8650f, dist: 0.07 } },
 ];
 
+const V = '?v=15'; // bump when assets are re-baked
 const RING = 1.95;
-const V = '?v=12'; // bump when assets are re-baked
-const BLOCK = 1.2;
-const BLOCK_H = 0.32;
+const BLOCK = 1.15;
+const BLOCK_H = 0.78;          // pedestal height: tops at y = 0, floor at y = -BLOCK_H
+const FLOOR = -BLOCK_H;
+const WALL = 0xe4d8c8, FLOOR_C = 0xd6c8b4;
 
-function dotTex() {
-  const c = document.createElement('canvas'); c.width = c.height = 32;
-  const x = c.getContext('2d'), g = x.createRadialGradient(16, 16, 0, 16, 16, 16);
+function canvasTex(w, h, draw, srgb = true) {
+  const c = document.createElement('canvas'); c.width = w; c.height = h;
+  draw(c.getContext('2d'), w, h);
+  const t = new THREE.CanvasTexture(c); if (srgb) t.colorSpace = THREE.SRGBColorSpace;
+  return t;
+}
+const dotTex = () => canvasTex(32, 32, (x) => {
+  const g = x.createRadialGradient(16, 16, 0, 16, 16, 16);
   g.addColorStop(0, 'rgba(255,255,255,1)'); g.addColorStop(0.6, 'rgba(255,250,230,.5)'); g.addColorStop(1, 'rgba(255,255,255,0)');
   x.fillStyle = g; x.fillRect(0, 0, 32, 32);
-  return new THREE.CanvasTexture(c);
-}
+});
+const plasterTex = () => canvasTex(512, 512, (x, w, h) => {
+  x.fillStyle = '#ffffff'; x.fillRect(0, 0, w, h);
+  for (let i = 0; i < 9000; i++) {
+    const v = 225 + Math.random() * 30;
+    x.fillStyle = `rgba(${v},${v - 4},${v - 10},${Math.random() * 0.25})`;
+    const r = Math.random() * 3 + 0.5; x.beginPath(); x.arc(Math.random() * w, Math.random() * h, r, 0, 7); x.fill();
+  }
+  for (let i = 0; i < 40; i++) {
+    x.strokeStyle = `rgba(200,188,170,${Math.random() * 0.12})`; x.lineWidth = 8 + Math.random() * 30;
+    x.beginPath(); const y = Math.random() * h; x.moveTo(-20, y); x.bezierCurveTo(w * 0.3, y + 40 - Math.random() * 80, w * 0.7, y - 40 + Math.random() * 80, w + 20, y + Math.random() * 30); x.stroke();
+  }
+});
+const softShadow = () => canvasTex(256, 256, (x) => {
+  const g = x.createRadialGradient(128, 128, 30, 128, 128, 128);
+  g.addColorStop(0, 'rgba(70,52,34,.55)'); g.addColorStop(0.55, 'rgba(70,52,34,.2)'); g.addColorStop(1, 'rgba(70,52,34,0)');
+  x.fillStyle = g; x.fillRect(0, 0, 256, 256);
+});
+const glow = () => canvasTex(256, 512, (x, w, h) => {
+  const g = x.createRadialGradient(w / 2, h * 0.62, 10, w / 2, h * 0.6, h * 0.55);
+  g.addColorStop(0, 'rgba(255,236,205,.95)'); g.addColorStop(0.5, 'rgba(255,226,190,.45)'); g.addColorStop(1, 'rgba(255,220,180,0)');
+  x.fillStyle = g; x.fillRect(0, 0, w, h);
+});
 
 const glassMat = (o, extra = {}) => {
   const m = new THREE.MeshPhysicalMaterial({
@@ -35,7 +63,6 @@ const glassMat = (o, extra = {}) => {
     attenuationColor: new THREE.Color(o.atten), attenuationDistance: o.dist,
     specularIntensity: 1, envMapIntensity: 2.2, dispersion: 0.1, ...extra,
   });
-  // real glass reads by its edges: darken (and tint) where the surface turns away from the camera
   const edge = new THREE.Color(o.atten).multiplyScalar(0.55);
   m.onBeforeCompile = (sh) => {
     sh.uniforms.uEdge = { value: edge };
@@ -81,11 +108,14 @@ class Product {
     this.model.position.y = -box.min.y * s;
     this.scale = s;
     if (def.drink) this._drink(A);
+    // travertine pedestal standing on the floor, with a soft floor shadow
     const block = new THREE.Mesh(A.blockGeo, A.travertine);
     block.position.y = -BLOCK_H / 2; block.rotation.y = 0.12; this.group.add(block);
+    const fs = new THREE.Mesh(new THREE.PlaneGeometry(BLOCK * 2.3, BLOCK * 2.3), A.floorShadow);
+    fs.rotation.x = -Math.PI / 2; fs.position.y = FLOOR + 0.003; this.group.add(fs);
     const sh = A.shadows[def.key];
     if (sh) {
-      const size = sh.size * s;  // shadow baked in Blender metres; s converts metres -> scene units
+      const size = sh.size * s;
       const decal = new THREE.Mesh(new THREE.PlaneGeometry(size, size), new THREE.MeshBasicMaterial({ map: sh.tex, transparent: true, depthWrite: false, opacity: 0.8, toneMapped: false }));
       decal.rotation.x = -Math.PI / 2; decal.position.y = 0.002; this.group.add(decal);
     }
@@ -156,19 +186,70 @@ export class Turntable {
     r.toneMapping = THREE.AgXToneMapping; r.toneMappingExposure = 1.05;
     r.outputColorSpace = THREE.SRGBColorSpace;
     this.scene = new THREE.Scene();
-    this.scene.background = new THREE.Color(0xede5da);
+    this.scene.background = new THREE.Color(0xcbbba5);
+    this.scene.fog = new THREE.Fog(0xd8cab6, 16, 40);
     RectAreaLightUniformsLib.init();
-    // two tall window softboxes: they show up as the vertical highlight streaks real glass has
     const win = (x, z, i, w) => { const l = new THREE.RectAreaLight(0xfff4e4, i, w, 2.6); l.position.set(x, 1.5, z); l.lookAt(0, 0.6, RING); this.scene.add(l); return l; };
-    this.winL = win(-2.6, RING + 1.6, 7, 0.9); this.winR = win(2.4, RING + 2.2, 3.5, 0.6);
-    this.camera = new THREE.PerspectiveCamera(32, 1, 0.05, 60);
+    win(-2.6, RING + 1.6, 7, 0.9); win(2.4, RING + 2.2, 3.5, 0.6);
+    this.camera = new THREE.PerspectiveCamera(32, 1, 0.05, 80);
     this.ring = new THREE.Group(); this.scene.add(this.ring);
     this.items = []; this.index = 0; this.cur = 0; this.visible = true;
-    this.drag = null; this.camState = null;
+    this.drag = null; this.dragOff = 0; this.camState = null;
+    this.ray = new THREE.Raycaster(); this.ndc = new THREE.Vector2();
     this._bind();
     new ResizeObserver(() => this.resize()).observe(canvas.parentElement);
     new IntersectionObserver(([e]) => { this.visible = e.isIntersecting; }).observe(canvas);
     this.resize();
+  }
+
+  _set(A) {
+    // the set is "baked": its lighting is painted into the textures, so it always looks the same warm boutique
+    const noise = (x, w, h, n, a) => { for (let i = 0; i < n; i++) { const v = 120 + Math.random() * 135; x.fillStyle = `rgba(${v},${v - 8},${v - 18},${Math.random() * a})`; x.beginPath(); x.arc(Math.random() * w, Math.random() * h, Math.random() * 2.4 + 0.4, 0, 7); x.fill(); } };
+    // curved plaster backdrop: warm pool of light behind the products, falling off to the sides and ceiling
+    const wallTex = canvasTex(2048, 768, (x, w, h) => {
+      x.fillStyle = '#cbbba5'; x.fillRect(0, 0, w, h);
+      const g = x.createRadialGradient(w * 0.5, h * 0.72, 20, w * 0.5, h * 0.7, w * 0.3);
+      g.addColorStop(0, '#f6ecdf'); g.addColorStop(0.45, '#eadfcf'); g.addColorStop(1, '#cbbba5');
+      x.fillStyle = g; x.fillRect(0, 0, w, h);
+      const v = x.createLinearGradient(0, 0, 0, h); v.addColorStop(0, 'rgba(120,100,78,.28)'); v.addColorStop(0.45, 'rgba(120,100,78,0)'); v.addColorStop(1, 'rgba(255,248,236,.12)');
+      x.fillStyle = v; x.fillRect(0, 0, w, h);
+      noise(x, w, h, 26000, 0.07);
+    });
+    const wall = new THREE.Mesh(new THREE.CylinderGeometry(13, 13, 10, 128, 1, true), new THREE.MeshBasicMaterial({ map: wallTex, side: THREE.BackSide, toneMapped: false }));
+    wall.position.set(0, FLOOR + 5, 0); this.scene.add(wall);
+    // stone floor: lit pool under the pedestals, darker toward the walls
+    const floorTex = canvasTex(1024, 1024, (x, w, h) => {
+      const g = x.createRadialGradient(w / 2, h / 2, 10, w / 2, h / 2, w / 2);
+      g.addColorStop(0, '#efe6da'); g.addColorStop(0.16, '#e6dccd'); g.addColorStop(0.45, '#d4c6b1'); g.addColorStop(1, '#c4b49d');
+      x.fillStyle = g; x.fillRect(0, 0, w, h);
+      for (let i = 0; i < 90; i++) { x.strokeStyle = `rgba(150,130,104,${Math.random() * 0.08})`; x.lineWidth = 1 + Math.random() * 3; x.beginPath(); const y = Math.random() * h; x.moveTo(0, y); x.bezierCurveTo(w * 0.3, y + 20, w * 0.6, y - 20, w, y + 10); x.stroke(); }
+      noise(x, w, h, 30000, 0.08);
+    });
+    const floor = new THREE.Mesh(new THREE.CircleGeometry(13, 128), new THREE.MeshBasicMaterial({ map: floorTex, toneMapped: false }));
+    floor.rotation.x = -Math.PI / 2; floor.position.y = FLOOR; this.scene.add(floor);
+    // three arched niches, the centre one glowing
+    const arch = (w, hgt) => {
+      const sh = new THREE.Shape(); sh.moveTo(-w / 2, 0); sh.lineTo(-w / 2, hgt - w / 2); sh.absarc(0, hgt - w / 2, w / 2, Math.PI, 0, true); sh.lineTo(w / 2, 0); sh.lineTo(-w / 2, 0);
+      return sh;
+    };
+    const nicheTex = canvasTex(256, 512, (x, w, h) => {
+      const g = x.createLinearGradient(0, 0, 0, h); g.addColorStop(0, '#c9b8a1'); g.addColorStop(0.6, '#ddcfbc'); g.addColorStop(1, '#e8ddce');
+      x.fillStyle = g; x.fillRect(0, 0, w, h); noise(x, w, h, 4000, 0.07);
+    });
+    const nicheMat = new THREE.MeshBasicMaterial({ map: nicheTex, toneMapped: false });
+    const rimMat = new THREE.MeshBasicMaterial({ color: 0xf1e8dc, toneMapped: false });
+    const glowMat = new THREE.MeshBasicMaterial({ map: glow(), transparent: true, depthWrite: false, toneMapped: false, opacity: 0.85 });
+    [[-4.2, 0.82, 0.35], [0, 1, 1], [4.2, 0.82, 0.35]].forEach(([x, k, gk]) => {
+      const w = 2.4 * k, h = 5.0 * k;
+      const z = -Math.sqrt(Math.max(0, 12.85 * 12.85 - x * x));
+      const frame = new THREE.Mesh(new THREE.ExtrudeGeometry(arch(w + 0.24, h + 0.12), { depth: 0.06, bevelEnabled: false, curveSegments: 48 }), rimMat);
+      frame.position.set(x, FLOOR, z); frame.lookAt(0, FLOOR, 0); this.scene.add(frame);
+      const inner = new THREE.Mesh(new THREE.ShapeGeometry(arch(w, h), 48), nicheMat);
+      inner.position.copy(frame.position); inner.lookAt(0, FLOOR, 0); inner.translateZ(0.07); this.scene.add(inner);
+      const gl = new THREE.Mesh(new THREE.ShapeGeometry(arch(w * 0.92, h * 0.96), 48), glowMat.clone());
+      gl.material.opacity = 0.85 * gk;
+      gl.position.copy(frame.position); gl.lookAt(0, FLOOR, 0); gl.translateZ(0.09); this.scene.add(gl);
+    });
   }
 
   async load(base = 'assets/glassit3d/') {
@@ -190,19 +271,17 @@ export class Turntable {
 
     hdr.mapping = THREE.EquirectangularReflectionMapping;
     this.scene.environment = hdr;
-    this.scene.background = hdr;
-    this.scene.backgroundBlurriness = 0.55;
-    this.scene.backgroundIntensity = 1.9;
-
     trav.wrapS = trav.wrapT = THREE.RepeatWrapping;
     const A = {
-      aniso, normals, dot: dotTex(),
+      aniso, normals, dot: dotTex(), travertineTex: trav,
       gold: new THREE.MeshPhysicalMaterial({ color: 0xf2c56b, metalness: 1, roughness: 0.17, envMapIntensity: 1.2, side: THREE.DoubleSide }),
       copper: new THREE.MeshPhysicalMaterial({ color: 0xe4a07e, metalness: 1, roughness: 0.22, envMapIntensity: 1.2 }),
-      travertine: new THREE.MeshPhysicalMaterial({ map: trav, roughness: 0.82, envMapIntensity: 0.95, sheen: 0.25, sheenColor: new THREE.Color(0xfff4e2) }),
-      blockGeo: new RoundedBoxGeometry(BLOCK, BLOCK_H, BLOCK, 4, 0.018),
+      travertine: new THREE.MeshPhysicalMaterial({ map: trav, color: 0xeee4d6, roughness: 0.82, envMapIntensity: 1.1, sheen: 0.25, sheenColor: new THREE.Color(0xfff4e2) }),
+      floorShadow: new THREE.MeshBasicMaterial({ map: softShadow(), transparent: true, depthWrite: false, toneMapped: false }),
+      blockGeo: new RoundedBoxGeometry(BLOCK, BLOCK_H, BLOCK, 4, 0.02),
       shadows: Object.fromEntries(TURN.map((d, i) => [d.key, shadowInfo[d.key] ? { size: shadowInfo[d.key].size, tex: shadowTex[i] } : null])),
     };
+    this._set(A);
     const step = (Math.PI * 2) / TURN.length;
     TURN.forEach((d, i) => {
       const p = new Product(d, gltfs[i], profiles[d.key], A);
@@ -215,23 +294,47 @@ export class Turntable {
     this.go(0, true);
   }
 
+  // drag on the front glass turns it; drag anywhere else swings the ring to the next product
   _bind() {
     const el = this.canvas;
-    el.addEventListener('pointerdown', (e) => { this.drag = { x: e.clientX, y: e.clientY, horiz: null }; });
-    addEventListener('pointermove', (e) => {
-      if (!this.drag) return;
-      const dx = e.clientX - this.drag.x, dy = e.clientY - this.drag.y;
-      if (this.drag.horiz === null && Math.hypot(dx, dy) > 6) this.drag.horiz = Math.abs(dx) > Math.abs(dy);
-      if (!this.drag.horiz) return;
-      this.drag.x = e.clientX; this.drag.y = e.clientY;
-      const p = this.items[this.mod(this.index)];
-      if (p) { p.spin.rotation.y += dx * 0.012; p.spinV = dx * 0.6; }
+    el.addEventListener('pointerdown', (e) => {
+      const r = el.getBoundingClientRect();
+      this.ndc.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
+      this.ray.setFromCamera(this.ndc, this.camera);
+      const active = this.items[this.mod(this.index)];
+      const onGlass = active && this.ray.intersectObject(active.model, true).length > 0;
+      this.drag = { x: e.clientX, y: e.clientY, lx: e.clientX, horiz: null, mode: onGlass ? 'turn' : 'ring', t: performance.now(), w: r.width };
     });
-    const up = () => { this.drag = null; };
+    addEventListener('pointermove', (e) => {
+      const d = this.drag; if (!d) return;
+      const dx = e.clientX - d.x, dy = e.clientY - d.y;
+      if (d.horiz === null && Math.hypot(dx, dy) > 6) d.horiz = Math.abs(dx) > Math.abs(dy);
+      if (!d.horiz) return;
+      const step = e.clientX - d.lx; d.lx = e.clientX;
+      if (d.mode === 'turn') { const p = this.items[this.mod(this.index)]; p.spin.rotation.y += step * 0.012; p.spinV = step * 0.6; }
+      else { this.dragOff = dx / (d.w * 0.32); d.vel = step; }
+    });
+    const up = () => {
+      const d = this.drag; this.drag = null; if (!d) return;
+      if (d.mode === 'ring' && d.horiz) {
+        const fling = (d.vel || 0) / (d.w * 0.32) * 6;
+        const target = Math.round(this.index - this.dragOff - fling);
+        this.cur = this.index - this.dragOff; this.dragOff = 0;
+        if (target !== this.index) this.go(target);
+      }
+      this.dragOff = 0;
+    };
     addEventListener('pointerup', up); addEventListener('pointercancel', up);
   }
 
   mod(i) { const n = this.items.length || TURN.length; return ((i % n) + n) % n; }
+  next() { this.go(this.index + 1); }
+  prev() { this.go(this.index - 1); }
+  goTo(i) { // nearest way round the ring to product i
+    const n = TURN.length, curM = this.mod(this.index);
+    let delta = i - curM; if (delta > n / 2) delta -= n; if (delta < -n / 2) delta += n;
+    this.go(this.index + delta);
+  }
 
   go(i, instant = false) {
     this.index = i;
@@ -253,13 +356,15 @@ export class Turntable {
 
   tick(dt, t) {
     if (!this.visible || !this.items.length) return;
-    this.cur += (this.index - this.cur) * (1 - Math.exp(-dt * 5));
+    const goal = this.index - this.dragOff;
+    this.cur += (goal - this.cur) * (1 - Math.exp(-dt * (this.drag ? 16 : 5)));
     this.ring.rotation.y = -this.cur * this.step;
     const ai = this.mod(Math.round(this.cur)), active = this.items[ai], h = TURN[ai].h;
     const vfov = THREE.MathUtils.degToRad(this.camera.fov);
-    let d = (h * 1.2 + 0.5) / (2 * Math.tan(vfov / 2));
-    if (this.camera.aspect < 0.9) d = Math.max(d, 2.0 / (2 * Math.tan(vfov / 2) * this.camera.aspect));
-    const target = { z: RING + d, y: h * 0.62 + 0.18, ly: h * 0.44 };
+    // product sits in the middle ~58% of the frame (heading above, buy bar below)
+    let d = (h * 1.15 + 0.35) / 0.5 / (2 * Math.tan(vfov / 2));
+    if (this.camera.aspect < 0.9) d = Math.max(d, 1.9 / (2 * Math.tan(vfov / 2) * this.camera.aspect));
+    const target = { z: RING + d, y: h * 0.55 + 0.55, ly: h * 0.42 };
     if (!this.camState) this.camState = { ...target };
     const k = 1 - Math.exp(-dt * 3.5);
     for (const key of Object.keys(target)) this.camState[key] += (target[key] - this.camState[key]) * k;
@@ -267,10 +372,11 @@ export class Turntable {
     this.camera.lookAt(0, this.camState.ly, RING);
     this.items.forEach((p) => {
       const isActive = p === active;
-      if (isActive && !this.drag) { p.spinV *= Math.pow(0.05, dt); p.spin.rotation.y += (0.3 + p.spinV * 0.02) * dt; }
+      const turning = this.drag && this.drag.mode === 'turn';
+      if (isActive && !turning) { p.spinV *= Math.pow(0.05, dt); p.spin.rotation.y += (0.3 + p.spinV * 0.02) * dt; }
       else if (!isActive) p.spin.rotation.y += 0.1 * dt;
       const s = isActive ? 1 : 0.9;
-      p.group.scale.setScalar(p.group.scale.x + (s - p.group.scale.x) * k);
+      p.spin.scale.setScalar(p.spin.scale.x + (s - p.spin.scale.x) * k);
       p.update(dt, t);
     });
     this.renderer.render(this.scene, this.camera);

@@ -95,7 +95,7 @@ function setFilter(cat, animate) {
 function cardHTML(p, i) {
   return `<article class="card enter" style="animation-delay:${(i % 8) * 50}ms" data-id="${p.id}">
     <div class="card__img"><img src="${p.image}" alt="${esc(p.name)}" loading="lazy" width="808" height="900"><span class="card__badge">-30%</span>
-      <button class="card__add" type="button" data-add="${p.id}">Add to bag</button></div>
+      <button class="card__add" type="button" data-add="${p.id}">Shop now</button></div>
     <div class="card__body"><h3>${esc(p.name)}</h3><small>${esc(desc(p))}</small><span class="price">${priceHTML(p)}</span></div>
   </article>`;
 }
@@ -114,7 +114,7 @@ $('.js-more').addEventListener('click', () => {
 });
 grid.addEventListener('click', (e) => {
   const b = e.target.closest('[data-add]'); if (!b) return;
-  addToBag(b.dataset.add, b.closest('.card').querySelector('img'));
+  shopNow(b.dataset.add);
 });
 function highlight(id) {
   const p = byId[id]; if (!p) return;
@@ -146,6 +146,12 @@ function addToBag(id, fromImg) {
   saveBag(); renderBag();
   if (fromImg) fly(fromImg);
   toast(`${byId[id].name} added to your bag`);
+}
+// "Shop now": put the piece in the bag (once) and go straight to checkout
+function shopNow(id) {
+  if (!bag.find((x) => x.id === id)) bag.push({ id, qty: 1 });
+  saveBag();
+  location.href = 'checkout.html';
 }
 function fly(img) {
   const a = img.getBoundingClientRect(), b = $('.js-bag-open').getBoundingClientRect();
@@ -182,12 +188,7 @@ const closeBag = () => { document.body.classList.remove('bag-open'); $('.bag').s
 $('.js-bag-open').addEventListener('click', openBag);
 $$('.js-bag-close').forEach((b) => b.addEventListener('click', closeBag));
 const mail = (subject, body) => { location.href = `mailto:${STORE.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`; };
-$('.js-checkout').addEventListener('click', () => {
-  const lines = bag.map((l) => { const p = byId[l.id]; return `• ${l.qty} × ${p.name} (${p.code || ''}) — ${fmt(p.price * l.qty)}`; }).join('\n');
-  const sub = bag.reduce((s, l) => s + l.qty * byId[l.id].price, 0);
-  mail('Order request — Glassit', `Hello Glassit,\n\nI'd like to order:\n${lines}\n\nSubtotal: ${fmt(sub)} (30% launch discount included)\n\nName:\nPhone:\nDelivery address:\n`);
-  toast('Opening your email app with the order…');
-});
+$('.js-checkout').addEventListener('click', () => { location.href = 'checkout.html'; });
 renderBag();
 
 /* ---------------- search ---------------- */
@@ -228,10 +229,9 @@ const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersec
 $$('.section-head, .story__copy, .story__media, .trade__inner, .value, .reel, .tile').forEach((el) => { el.classList.add('rv'); io.observe(el); });
 new IntersectionObserver(([e]) => $('.shopbar').classList.toggle('on', !e.isIntersecting && !document.body.classList.contains('at-shop')), { threshold: 0 }).observe($('.hero__ctas'));
 
-/* ---------------- 4 · 3D carousel ---------------- */
+/* ---------------- 4 · 3D gallery (not scroll-driven: swipe, drag, arrows, dots, keys) ---------------- */
 async function initTurn() {
-  const { Turntable, TURN } = await import('./turntable.js?v=12');
-  const N = TURN.length;
+  const { Turntable, TURN } = await import('./turntable.js?v=15');
   const info = $('.js-turn-info');
   let current = 0;
   const dots = $('.js-dots');
@@ -248,45 +248,23 @@ async function initTurn() {
   show(0);
   await tt.load();
   $('.js-turn-loading').classList.add('done');
-
-  // scroll drives the carousel while the section is pinned
-  const st = ScrollTrigger.create({
-    trigger: '.turn', start: 'top top', end: () => '+=' + innerHeight * 0.55 * (N - 1), pin: '.turn__pin', pinSpacing: true,
-    snap: { snapTo: 1 / (N - 1), duration: { min: 0.2, max: 0.6 }, ease: 'power2.inOut', delay: 0.05 },
-    onUpdate: (s) => { const i = Math.round(s.progress * (N - 1)); if (i !== tt.index) tt.go(i); },
-  });
-  const goto = (i) => {
-    i = Math.max(0, Math.min(N - 1, i));
-    const y = st.start + (st.end - st.start) * (i / (N - 1));
-    if (scrollY < st.start - 2 || scrollY > st.end + 2) { tt.go(i); return; }
-    scrollToEl(y);
-  };
-  $('.js-prev').addEventListener('click', () => goto(tt.index - 1));
-  $('.js-next').addEventListener('click', () => goto(tt.index + 1));
-  dots.addEventListener('click', (e) => { const b = e.target.closest('[data-i]'); if (b) goto(+b.dataset.i); });
-  // quick horizontal swipe on the stage moves to the next/previous product
-  let sw = null;
-  $('#turn-canvas').addEventListener('pointerdown', (e) => { sw = { x: e.clientX, y: e.clientY, t: performance.now() }; });
-  $('#turn-canvas').addEventListener('pointerup', (e) => {
-    if (!sw) return;
-    const dx = e.clientX - sw.x, dy = e.clientY - sw.y, dt = performance.now() - sw.t; sw = null;
-    if (dt < 350 && Math.abs(dx) > 70 && Math.abs(dx) > Math.abs(dy) * 1.5) goto(tt.index + (dx < 0 ? 1 : -1));
-  });
+  $('.js-prev').addEventListener('click', () => tt.prev());
+  $('.js-next').addEventListener('click', () => tt.next());
+  dots.addEventListener('click', (e) => { const b = e.target.closest('[data-i]'); if (b) tt.goTo(+b.dataset.i); });
   addEventListener('keydown', (e) => {
     const r = $('.turn').getBoundingClientRect();
-    if (r.top > innerHeight * 0.5 || r.bottom < innerHeight * 0.5) return;
-    if (e.key === 'ArrowRight') goto(tt.index + 1);
-    if (e.key === 'ArrowLeft') goto(tt.index - 1);
+    if (r.top > innerHeight * 0.5 || r.bottom < innerHeight * 0.5 || e.target.closest('input, textarea')) return;
+    if (e.key === 'ArrowRight') tt.next();
+    if (e.key === 'ArrowLeft') tt.prev();
   });
-  $('.js-t-add').addEventListener('click', () => addToBag(TURN[current].id, null));
-  $('.js-t-shop').addEventListener('click', () => setTimeout(() => highlight(TURN[current].id), 60));
+  $('.js-t-shop').addEventListener('click', () => shopNow(TURN[current].id));
 
   let last = performance.now();
   gsap.ticker.add(() => {
     const now = performance.now(), dt = Math.min(0.05, (now - last) / 1000); last = now;
     if (!document.hidden) tt.tick(dt, now / 1000);
   });
-  window.__glassit = { tt, st, lenis };
+  window.__glassit = { tt, lenis };
 }
 function webgl() { try { const c = document.createElement('canvas'); return !!(c.getContext('webgl2') || c.getContext('webgl')); } catch { return false; } }
 if (webgl()) initTurn().catch((err) => { console.error(err); $('.js-turn-loading').innerHTML = 'The 3D view could not load on this device.'; });

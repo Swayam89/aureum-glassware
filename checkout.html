@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Checkout — Glassit</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#f6f2ec">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/brand/favicon-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="assets/brand/favicon-192.png">
+<link rel="apple-touch-icon" sizes="180x180" href="assets/brand/favicon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Cormorant+Garamond:wght@400;500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/landing.css?v=13">
+<link rel="stylesheet" href="css/checkout.css?v=1">
+</head>
+<body class="co">
+
+<div class="ticker ticker--static" role="note"><span><b>Launch sale: 30% off</b> already applied to every piece in your bag</span></div>
+
+<header class="co-head">
+  <a class="co-back" href="landing.html#shop"><svg viewBox="0 0 24 24"><path d="M15 5 8 12l7 7"/></svg><span>Continue shopping</span></a>
+  <a class="logo" href="landing.html" aria-label="Glassit home"><span class="logo__word">GLASSIT</span><span class="logo__tag">The Perfect Host</span></a>
+  <span class="co-secure"><svg viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="10" rx="1.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg><span>Checkout</span></span>
+</header>
+
+<ol class="co-steps" aria-label="Checkout steps">
+  <li class="done">Bag</li><li class="on">Details</li><li class="js-step-pay">Payment</li><li class="js-step-done">Confirmation</li>
+</ol>
+
+<main class="co-main js-co">
+  <form class="co-form js-form" novalidate>
+    <section class="co-card">
+      <h2><span>1</span>Contact</h2>
+      <div class="grid2">
+        <div class="field"><input id="c-email" name="email" type="email" autocomplete="email" required placeholder=" "><label for="c-email">Email</label></div>
+        <div class="field"><input id="c-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" required placeholder=" " pattern="[0-9+ -]{10,15}"><label for="c-phone">Mobile number</label></div>
+      </div>
+      <label class="check"><input type="checkbox" name="b2b" class="js-b2b"><span>This is a business / bulk order (B2B)</span></label>
+      <div class="grid2 js-b2b-fields" hidden>
+        <div class="field"><input id="c-company" name="company" autocomplete="organization" placeholder=" "><label for="c-company">Business name</label></div>
+        <div class="field"><input id="c-gst" name="gstin" placeholder=" " maxlength="15" style="text-transform:uppercase"><label for="c-gst">GSTIN (optional)</label></div>
+      </div>
+    </section>
+
+    <section class="co-card">
+      <h2><span>2</span>Delivery address</h2>
+      <div class="field"><input id="c-name" name="name" autocomplete="name" required placeholder=" "><label for="c-name">Full name</label></div>
+      <div class="field"><input id="c-a1" name="address1" autocomplete="address-line1" required placeholder=" "><label for="c-a1">Flat, house, building</label></div>
+      <div class="field"><input id="c-a2" name="address2" autocomplete="address-line2" placeholder=" "><label for="c-a2">Area, street, landmark (optional)</label></div>
+      <div class="grid3">
+        <div class="field"><input id="c-city" name="city" autocomplete="address-level2" required placeholder=" "><label for="c-city">City</label></div>
+        <div class="field field--select"><select id="c-state" name="state" autocomplete="address-level1" required class="js-states"></select><label for="c-state">State</label></div>
+        <div class="field"><input id="c-pin" name="pin" inputmode="numeric" autocomplete="postal-code" required placeholder=" " maxlength="6" pattern="[1-9][0-9]{5}"><label for="c-pin">PIN code</label></div>
+      </div>
+    </section>
+
+    <section class="co-card">
+      <h2><span>3</span>Payment</h2>
+      <div class="pay">
+        <label class="pay__opt"><input type="radio" name="payment" value="UPI" checked><span><b>UPI</b><small>Pay by any UPI app. We send a payment request once your order is confirmed.</small></span></label>
+        <label class="pay__opt"><input type="radio" name="payment" value="Card / net banking"><span><b>Card or net banking</b><small>We send a secure payment link once your order is confirmed.</small></span></label>
+        <label class="pay__opt"><input type="radio" name="payment" value="Cash on delivery"><span><b>Cash on delivery</b><small>Pay when your glassware arrives.</small></span></label>
+      </div>
+      <div class="field"><textarea id="c-note" name="note" rows="2" placeholder=" "></textarea><label for="c-note">Order note, gift message or delivery instructions (optional)</label></div>
+    </section>
+
+    <button class="btn btn--dark btn--block co-place js-place" type="submit">Place order · <span class="js-total-btn">₹0</span></button>
+    <p class="co-fine">Your order goes to the Glassit team, who confirm stock, delivery charge and payment with you before anything ships.</p>
+  </form>
+
+  <aside class="co-sum">
+    <div class="co-card co-card--sum">
+      <div class="co-sum__head"><h2>Your order</h2><span class="js-count">0 items</span></div>
+      <div class="co-items js-items"></div>
+      <div class="co-totals">
+        <div><span>Price</span><s class="js-mrp">₹0</s></div>
+        <div class="save"><span>Launch discount (30%)</span><b class="js-save">−₹0</b></div>
+        <div><span>Subtotal</span><b class="js-sub">₹0</b></div>
+        <div><span>Delivery</span><span class="muted">Confirmed with your order</span></div>
+        <div class="total"><span>Total</span><b class="js-total">₹0</b></div>
+      </div>
+      <p class="co-badge"><svg viewBox="0 0 24 24"><path d="M4 9h16l-1.5 11h-13z"/><path d="M8 9V6a4 4 0 0 1 8 0v3"/></svg>You save <b class="js-save2">₹0</b> on this order</p>
+    </div>
+  </aside>
+</main>
+
+<section class="co-empty js-empty" hidden>
+  <h1>Your bag is empty</h1>
+  <p>Choose a piece and press <b>Shop now</b> to come back here.</p>
+  <a class="btn btn--dark" href="landing.html#shop">Browse the collection</a>
+</section>
+
+<section class="co-done js-done" hidden>
+  <div class="co-done__icon"><svg viewBox="0 0 24 24"><path d="m5 12 5 5 9-10"/></svg></div>
+  <p class="eyebrow">Order <span class="js-oid"></span></p>
+  <h1>Almost there, <em class="js-oname"></em></h1>
+  <p class="js-done-msg">Your email app has opened with the full order. Press send and the Glassit team will confirm stock, delivery and payment with you.</p>
+  <div class="co-done__btns">
+    <button class="btn btn--line js-resend" type="button">Open the email again</button>
+    <a class="btn btn--dark" href="landing.html">Back to the store</a>
+  </div>
+</section>
+
+<div class="toasts" aria-live="polite"></div>
+<script type="module" src="js/checkout.js?v=1"></script>
+</body>
+</html>
