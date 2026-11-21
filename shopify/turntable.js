@@ -3,6 +3,7 @@
 // light map. Swipe / drag / arrows move the ring; dragging a glass turns it. Not scroll-driven.
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { RectAreaLightUniformsLib } from 'three/addons/lights/RectAreaLightUniformsLib.js';
@@ -16,7 +17,7 @@ export const TURN = [
   { key: 'dispenser', id: 'amber-ribbed-cylinder-dispenser', h: 1.9, glass: { color: 0xf3a648, atten: 0xb8650f, dist: 0.07 } },
 ];
 
-const V = '?v=15'; // bump when assets are re-baked
+const V = '?v=16'; // bump when assets are re-baked
 const RING = 1.95;
 const BLOCK = 1.15;
 const BLOCK_H = 0.78;          // pedestal height: tops at y = 0, floor at y = -BLOCK_H
@@ -182,7 +183,7 @@ export class Turntable {
     this.canvas = canvas; this.onChange = onChange;
     this.mobile = matchMedia('(max-width: 980px), (pointer: coarse)').matches;
     const r = this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
-    r.setPixelRatio(Math.min(devicePixelRatio, this.mobile ? 1.6 : 2));
+    r.setPixelRatio(Math.min(devicePixelRatio, this.mobile ? 1.5 : 2));
     r.toneMapping = THREE.AgXToneMapping; r.toneMappingExposure = 1.05;
     r.outputColorSpace = THREE.SRGBColorSpace;
     this.scene = new THREE.Scene();
@@ -254,16 +255,17 @@ export class Turntable {
 
   async load(base = 'assets/glassit3d/') {
     const gltfL = new GLTFLoader(), texL = new THREE.TextureLoader();
+    gltfL.setDRACOLoader(new DRACOLoader().setDecoderPath('https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/libs/draco/gltf/'));
     const aniso = this.renderer.capabilities.getMaxAnisotropy();
     const tex = (url, srgb = true) => texL.loadAsync(base + url + V).then((t) => { t.colorSpace = srgb ? THREE.SRGBColorSpace : THREE.NoColorSpace; t.anisotropy = aniso; return t; });
     const [hdr, profiles, shadowInfo, trav, ...rest] = await Promise.all([
-      new RGBELoader().loadAsync(base + 'studio.hdr' + V),
+      new RGBELoader().loadAsync(base + 'studio-1k.hdr' + V),
       fetch(base + 'profiles.json' + V).then((r) => r.json()),
       fetch(base + 'shadows.json' + V).then((r) => r.json()),
       tex('travertine.jpg'),
-      ...['tiger', 'peacock', 'lion'].map((k) => tex(`medallion-${k}-normal.png`, false)),
+      ...['tiger', 'peacock', 'lion'].map((k) => tex(`medallion-${k}-normal.jpg`, false)),
       ...TURN.map((d) => tex(`shadow-${d.key}.png`)),
-      ...TURN.map((d) => gltfL.loadAsync(base + d.key + '.glb' + V)),
+      ...TURN.map((d) => gltfL.loadAsync(base + d.key + '-c.glb' + V)),
     ]);
     const normals = { tiger: rest[0], peacock: rest[1], lion: rest[2] };
     Object.values(normals).forEach((t) => { t.flipY = false; t.needsUpdate = true; });

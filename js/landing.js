@@ -230,7 +230,7 @@ new IntersectionObserver(([e]) => $('.shopbar').classList.toggle('on', !e.isInte
 
 /* ---------------- 4 · 3D gallery (not scroll-driven: swipe, drag, arrows, dots, keys) ---------------- */
 async function initTurn() {
-  const { Turntable, TURN } = await import('./turntable.js?v=15');
+  const { Turntable, TURN } = await import('./turntable.js?v=16');
   const info = $('.js-turn-info');
   let current = 0;
   const dots = $('.js-dots');
@@ -267,7 +267,14 @@ async function initTurn() {
   window.__glassit = { tt, lenis };
 }
 function webgl() { try { const c = document.createElement('canvas'); return !!(c.getContext('webgl2') || c.getContext('webgl')); } catch { return false; } }
-if (webgl()) initTurn().catch((err) => { console.error(err); $('.js-turn-loading').innerHTML = 'The 3D view could not load on this device.'; });
+// start the 3D gallery only when it is about to scroll into view (keeps first load light, especially on phones)
+function whenNear(el, fn) {
+  if (!el || !('IntersectionObserver' in window)) return fn();
+  const watch = () => { const o = new IntersectionObserver((es) => { if (es.some((e) => e.isIntersecting)) { o.disconnect(); fn(); } }, { rootMargin: '400px 0px' }); o.observe(el); };
+  const idle = () => (window.requestIdleCallback ? requestIdleCallback(watch, { timeout: 2500 }) : setTimeout(watch, 600));
+  if (document.readyState === 'complete') idle(); else addEventListener('load', idle, { once: true });
+}
+if (webgl()) whenNear($('#turn'), () => initTurn().catch((err) => { console.error(err); $('.js-turn-loading').innerHTML = 'The 3D view could not load on this device.'; }));
 else $('.js-turn-loading').innerHTML = 'The 3D view needs WebGL.';
 
 // keep the sticky shop bar from covering the carousel's buttons

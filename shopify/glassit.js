@@ -239,11 +239,21 @@ async function initTurn() {
     if (!document.hidden) tt.tick(dt, now / 1000);
   });
 }
+// start the 3D gallery only when it is about to scroll into view (keeps first load light, especially on phones)
+function whenNear(el, fn) {
+  if (!el || !('IntersectionObserver' in window)) return fn();
+  const watch = () => { const o = new IntersectionObserver((es) => { if (es.some((e) => e.isIntersecting)) { o.disconnect(); fn(); } }, { rootMargin: '400px 0px' }); o.observe(el); };
+  const idle = () => (window.requestIdleCallback ? requestIdleCallback(watch, { timeout: 2500 }) : setTimeout(watch, 600));
+  if (document.readyState === 'complete') idle(); else addEventListener('load', idle, { once: true });
+}
 function webgl() { try { const c = document.createElement('canvas'); return !!(c.getContext('webgl2') || c.getContext('webgl')); } catch { return false; } }
 
 /* ---------------- boot ---------------- */
 (async () => {
   try { await loadProducts(); } catch (e) { console.error('products', e); }
+  // keep the server-rendered cards first, in the same order, so the grid does not jump when the script takes over
+  const ssr = grid ? $$('[data-id]', grid).map((e) => e.dataset.id) : [];
+  if (ssr.length) { const rank = (p) => { const i = ssr.indexOf(p.id); return i < 0 ? 1e9 : i; }; PRODUCTS.sort((x, y) => rank(x) - rank(y)); }
   // chips with live counts
   const chips = $('.js-chips');
   if (chips) {
@@ -259,7 +269,7 @@ function webgl() { try { const c = document.createElement('canvas'); return !!(c
   if (hp && byId[hp.dataset.handle]) hp.innerHTML = priceHTML(byId[hp.dataset.handle]);
   refreshCart();
   if ($('#turn-canvas')) {
-    if (webgl()) initTurn().catch((err) => { console.error(err); $('.js-turn-loading').innerHTML = 'The 3D view could not load on this device.'; });
+    if (webgl()) whenNear($('#turn'), () => initTurn().catch((err) => { console.error(err); $('.js-turn-loading').innerHTML = 'The 3D view could not load on this device.'; }));
     else $('.js-turn-loading').innerHTML = 'The 3D view needs WebGL.';
   }
   ScrollTrigger.refresh();
