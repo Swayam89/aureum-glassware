@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Glassit — The Perfect Host</title>
+<meta name="description" content="Glassit glassware: wine and cocktail glasses, tumblers, gold-detail whisky glasses, beer mugs, cups and dispensers. 30% off for launch. Retail and trade orders.">
+<meta name="theme-color" content="#f6f2ec">
+<meta property="og:title" content="Glassit — The Perfect Host">
+<meta property="og:description" content="Luxury glassware for home and hospitality. 30% off for launch.">
+<meta property="og:image" content="assets/glassit/hero-cover.jpg">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231d1a17'/%3E%3Ctext x='32' y='44' text-anchor='middle' font-family='Georgia' font-size='34' fill='%23f6f2ec'%3EG%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Cormorant+Garamond:wght@400;500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/landing.css?v=4">
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+} }
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
+<script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js" defer></script>
+</head>
+<body>
+
+<!-- 1 · announcement ticker -->
+<div class="ticker" role="region" aria-label="Announcements">
+  <div class="ticker__track js-ticker"></div>
+</div>
+
+<!-- 2 · navigation -->
+<header class="nav" id="top">
+  <button class="nav__burger js-burger" type="button" aria-label="Open menu" aria-expanded="false"><i></i><i></i><i></i></button>
+  <a class="logo" href="#top" aria-label="Glassit home">
+    <span class="logo__word">GLASSIT</span>
+    <span class="logo__tag">The Perfect Host</span>
+  </a>
+  <nav class="nav__links" aria-label="Primary">
+    <a href="#shop" data-cat="all">Shop all</a>
+    <a href="#shop" data-cat="wine">Wine &amp; Cocktail</a>
+    <a href="#shop" data-cat="gold">Gold Detail</a>
+    <a href="#shop" data-cat="beer">Bar &amp; Beer</a>
+    <a href="#shop" data-cat="tumblers">Tumblers</a>
+    <a href="#trade">Trade &amp; B2B</a>
+  </nav>
+  <div class="nav__actions">
+    <button class="icon js-search-open" type="button" aria-label="Search">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></svg>
+    </button>
+    <button class="icon bag-btn js-bag-open" type="button" aria-label="Open bag">
+      <svg viewBox="0 0 24 24"><path d="M5.5 8h13l-1 12.2a1 1 0 0 1-1 .8H7.5a1 1 0 0 1-1-.8L5.5 8Z"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8"/></svg>
+      <span class="bag-btn__n js-bag-count">0</span>
+    </button>
+    <a class="btn btn--dark btn--sm nav__cta" href="#shop">Shop now</a>
+  </div>
+</header>
+
+<div class="drawer-menu" aria-hidden="true">
+  <nav>
+    <a href="#shop" data-cat="all">Shop all</a>
+    <a href="#shop" data-cat="wine">Wine &amp; Cocktail</a>
+    <a href="#shop" data-cat="tumblers">Tumblers</a>
+    <a href="#shop" data-cat="gold">Gold Detail</a>
+    <a href="#shop" data-cat="beer">Bar &amp; Beer</a>
+    <a href="#shop" data-cat="cups">Cups &amp; Saucers</a>
+    <a href="#shop" data-cat="dispensers">Dispensers</a>
+    <a href="#trade">Trade &amp; B2B</a>
+  </nav>
+</div>
+
+<main>
+<!-- 3 · hero (static) -->
+<section class="hero">
+  <div class="hero__copy">
+    <p class="eyebrow"><span class="pill">Launch offer</span> 30% off every piece</p>
+    <h1>Glassware for the <em>perfect host.</em></h1>
+    <p class="hero__lede">Wine and cocktail glasses, gold-detail whisky sets, tumblers, beer mugs and dispensers. Made to be noticed on the table, priced for every home and every bar.</p>
+    <div class="hero__ctas">
+      <a class="btn btn--dark" href="#shop">Shop now</a>
+      <a class="btn btn--line" href="#turn">Explore further</a>
+    </div>
+    <ul class="hero__facts">
+      <li><b>91</b><span>designs</span></li>
+      <li><b>6</b><span>collections</span></li>
+      <li><b>B2B</b><span>trade pricing</span></li>
+    </ul>
+  </div>
+  <figure class="hero__media">
+    <img src="assets/glassit/hero-cover.jpg" alt="Two-tone round wine glass with a smoke-grey bowl and an amber stem on travertine" width="1400" height="1160" fetchpriority="high">
+    <span class="hero__badge"><b>30%</b>off</span>
+    <figcaption class="hero__tag">
+      <small>On the cover</small>
+      <b>Two-Tone Round Wine Glass</b>
+      <span class="price js-hero-price"></span>
+      <a href="#shop" class="link-arrow js-hero-shop">Shop now</a>
+    </figcaption>
+  </figure>
+</section>
+
+<!-- 4 · 3D carousel -->
+<section class="turn" id="turn">
+  <div class="turn__pin">
+    <div class="turn__head">
+      <p class="eyebrow">In the round</p>
+      <h2>Turn it over <em>before you buy.</em></h2>
+      <p class="turn__hint"><span class="hint-desk">Scroll or use the arrows to move · drag a glass to turn it</span><span class="hint-touch">Swipe to move · drag a glass to turn it</span></p>
+    </div>
+    <div class="turn__stage" data-cursor="Drag">
+      <canvas id="turn-canvas" aria-label="3D product carousel"></canvas>
+      <div class="turn__loading js-turn-loading"><span></span>Loading 3D</div>
+      <button class="turn__arrow turn__arrow--prev js-prev" type="button" aria-label="Previous product"><svg viewBox="0 0 24 24"><path d="M15 5 8 12l7 7"/></svg></button>
+      <button class="turn__arrow turn__arrow--next js-next" type="button" aria-label="Next product"><svg viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></svg></button>
+    </div>
+    <div class="turn__info">
+      <div class="turn__meta js-turn-info">
+        <small class="js-t-cat">Gold-detail glassware</small>
+        <h3 class="js-t-name">Smoke Tiger Whisky Glass Set</h3>
+        <p class="js-t-desc">SWG0312A-B · 6 pieces</p>
+      </div>
+      <div class="turn__buy">
+        <span class="price price--lg js-t-price"></span>
+        <div class="turn__btns">
+          <button class="btn btn--dark js-t-add" type="button">Add to bag</button>
+          <a class="btn btn--line js-t-shop" href="#shop">Shop now</a>
+        </div>
+      </div>
+      <div class="turn__dots js-dots" role="tablist" aria-label="Products"></div>
+    </div>
+  </div>
+</section>
+
+<!-- 5 · product photos / shop grid -->
+<section class="shop" id="shop">
+  <div class="section-head">
+    <div>
+      <p class="eyebrow">The catalogue</p>
+      <h2>Shop the <em>collection.</em></h2>
+    </div>
+    <p class="section-head__aside">Every price below already includes the 30% launch discount.</p>
+  </div>
+  <div class="chips js-chips" role="tablist" aria-label="Filter by collection"></div>
+  <div class="grid js-grid"></div>
+  <div class="shop__more">
+    <button class="btn btn--line js-more" type="button">Show more</button>
+    <p class="shop__count js-count"></p>
+  </div>
+</section>
+
+<!-- 6 · content -->
+<section class="collections">
+  <div class="section-head">
+    <div>
+      <p class="eyebrow">Collections</p>
+      <h2>Something for <em>every pour.</em></h2>
+    </div>
+  </div>
+  <div class="tiles js-tiles"></div>
+</section>
+
+<section class="story">
+  <figure class="story__media">
+    <img src="assets/catalog/peacock-medallion-tumbler-set.jpg" alt="Amber tumbler with an enamel peacock medallion in a gold ring" loading="lazy">
+    <img class="story__inset" src="assets/catalog/smoke-tiger-whisky-glass-set.jpg" alt="Smoke-grey whisky glass with a gold tiger medallion" loading="lazy">
+  </figure>
+  <div class="story__copy">
+    <p class="eyebrow">The perfect host</p>
+    <h2>Set a table people <em>remember.</em></h2>
+    <p>Glassit started with a simple idea: the glass you pour into should feel as considered as what's in it. Our range runs from slim champagne flutes and ribbed coupes to heavy whisky glasses with gold medallions, plus everyday tumblers, tea cups and dispensers.</p>
+    <p>Most designs come as matched sets of two, four, six or twelve, so you can lay a full table or stock a bar in one order.</p>
+    <a class="link-arrow" href="#shop">Browse all designs</a>
+  </div>
+</section>
+
+<section class="trade" id="trade">
+  <div class="trade__inner">
+    <div>
+      <p class="eyebrow eyebrow--light">Trade &amp; B2B</p>
+      <h2>Stocking a bar, hotel or <em>gift order?</em></h2>
+      <p>Restaurants, cafés, hotels, wedding planners and corporate gifting teams can order in bulk with trade pricing and repeat orders on the same designs.</p>
+    </div>
+    <ul class="trade__list">
+      <li><b>Bulk pricing</b><span>Tiered rates for larger quantities</span></li>
+      <li><b>Mix the range</b><span>Combine designs across collections</span></li>
+      <li><b>Reorders</b><span>Replace breakages on the same design</span></li>
+    </ul>
+    <a class="btn btn--light js-trade-mail" href="#">Request trade pricing</a>
+  </div>
+</section>
+
+<section class="values">
+  <div class="value"><svg viewBox="0 0 24 24"><path d="M4 9h16l-1.5 11h-13z"/><path d="M8 9V6a4 4 0 0 1 8 0v3"/></svg><b>30% off launch</b><span>Already applied to every price</span></div>
+  <div class="value"><svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="1"/><path d="M3 11h18M12 7v13M8 7c-2-3 2-5 4 0 2-5 6-3 4 0"/></svg><b>Gift-ready sets</b><span>Matched sets of 2, 4, 6 and 12</span></div>
+  <div class="value"><svg viewBox="0 0 24 24"><path d="M3 21V8l9-5 9 5v13"/><path d="M9 21v-7h6v7"/></svg><b>For home &amp; trade</b><span>Retail and bulk orders</span></div>
+  <div class="value"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7v5l3 2"/></svg><b>Six collections</b><span>91 designs to choose from</span></div>
+</section>
+
+<!-- 7 · Instagram (placeholders) -->
+<section class="insta">
+  <div class="section-head">
+    <div>
+      <p class="eyebrow">On Instagram</p>
+      <h2>Poured, styled, <em>shared.</em></h2>
+    </div>
+    <a class="btn btn--line btn--sm js-insta-link" href="#" aria-disabled="true">Follow us</a>
+  </div>
+  <div class="reels">
+    <div class="reel"><span class="reel__play"></span><small>Reel coming soon</small></div>
+    <div class="reel"><span class="reel__play"></span><small>Reel coming soon</small></div>
+    <div class="reel"><span class="reel__play"></span><small>Reel coming soon</small></div>
+    <div class="reel"><span class="reel__play"></span><small>Reel coming soon</small></div>
+    <div class="reel"><span class="reel__play"></span><small>Reel coming soon</small></div>
+  </div>
+</section>
+</main>
+
+<footer class="footer">
+  <div class="footer__top">
+    <div class="footer__brand">
+      <a class="logo logo--lg" href="#top"><span class="logo__word">GLASSIT</span><span class="logo__tag">The Perfect Host</span></a>
+      <p>Luxury glassware for homes, bars, hotels and gifting.</p>
+      <form class="news js-news" novalidate>
+        <label for="news-email">Offers and new arrivals</label>
+        <div class="news__row"><input id="news-email" type="email" placeholder="Your email" required><button class="btn btn--dark btn--sm" type="submit">Sign up</button></div>
+      </form>
+    </div>
+    <div class="footer__col"><h4>Shop</h4>
+      <a href="#shop" data-cat="wine">Wine &amp; Cocktail</a><a href="#shop" data-cat="tumblers">Tumblers</a><a href="#shop" data-cat="gold">Gold Detail</a><a href="#shop" data-cat="beer">Beer &amp; Whisky Sets</a><a href="#shop" data-cat="cups">Cups &amp; Saucers</a><a href="#shop" data-cat="dispensers">Water Dispensers</a>
+    </div>
+    <div class="footer__col"><h4>Company</h4><a href="#trade">Trade &amp; B2B</a><a href="#top">About Glassit</a><a class="js-contact" href="#">Contact</a></div>
+    <div class="footer__col"><h4>Help</h4><a href="#" aria-disabled="true">Shipping</a><a href="#" aria-disabled="true">Returns</a><a href="#" aria-disabled="true">Care guide</a></div>
+  </div>
+  <div class="footer__base"><span>© 2026 Glassit</span><span>Prices in INR, including the 30% launch discount.</span></div>
+</footer>
+
+<!-- sticky mobile shop bar -->
+<a class="shopbar" href="#shop"><span>30% off everything</span><b>Shop now</b></a>
+
+<!-- bag drawer -->
+<aside class="bag" aria-hidden="true" aria-label="Your bag">
+  <div class="bag__scrim js-bag-close"></div>
+  <div class="bag__panel">
+    <div class="bag__head"><h3>Your bag</h3><button class="icon js-bag-close" type="button" aria-label="Close bag">✕</button></div>
+    <div class="bag__items js-bag-items"></div>
+    <div class="bag__foot">
+      <div class="bag__row"><span>You save</span><b class="js-bag-save">₹0</b></div>
+      <div class="bag__row bag__row--total"><span>Subtotal</span><b class="js-bag-sub">₹0</b></div>
+      <button class="btn btn--dark btn--block js-checkout" type="button">Place order request</button>
+      <p class="bag__note">Opens your email app with the order. We confirm stock, delivery and payment by reply.</p>
+    </div>
+  </div>
+</aside>
+
+<!-- search -->
+<div class="search" aria-hidden="true">
+  <div class="search__panel">
+    <input class="js-search" type="search" placeholder="Search 91 designs: flute, tiger, amber…" aria-label="Search products" autocomplete="off">
+    <button class="icon js-search-close" type="button" aria-label="Close search">✕</button>
+    <div class="search__results js-search-results"></div>
+  </div>
+</div>
+
+<div class="toasts" aria-live="polite"></div>
+
+<script type="module" src="js/landing.js?v=3"></script>
+</body>
+</html>
