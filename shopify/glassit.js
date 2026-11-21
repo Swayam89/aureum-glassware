@@ -20,6 +20,16 @@ const off = (p) => Math.floor((1 - p.price / mrp(p)) * 100 + 1e-9);
 const priceHTML = (p) => (mrp(p) > p.price ? `<s>${fmt(mrp(p))}</s><b>${fmt(p.price)}</b><i>-${off(p)}%</i>` : `<b>${fmt(p.price)}</b>`);
 const desc = (p) => [p.code, p.meta].filter(Boolean).join(' · ');
 
+// short spec line for cards ("6 pieces · 250 mL"), read from the Details list in the product description
+const spec = (html, k) => ((html.match(new RegExp('<strong>' + k + ':</strong>\\s*([^<]+)')) || [])[1] || '').trim();
+function metaFrom(html, sku) {
+  const pcs = spec(html, 'Pieces'), set = spec(html, 'Set'), cap = spec(html, 'Capacity').replace(/ each$/, '');
+  const size = spec(html, 'Size').replace(/([\d.]+) cm diameter × ([\d.]+) cm height/, 'Ø $1 cm, H $2 cm');
+  const out = [set || (pcs && pcs + ' pieces'), size, cap].filter(Boolean).join(' · ');
+  if (out) return out;
+  const plain = html.replace(/<[^>]+>/g, '').replace(sku || '\u0000', '').replace(/^\s*·\s*/, '').trim();
+  return plain.length < 60 ? plain : '';
+}
 let PRODUCTS = [], byId = {};
 async function loadProducts() {
   const out = [];
@@ -34,7 +44,7 @@ async function loadProducts() {
     return {
       id: p.handle, name: p.title, url: `/products/${p.handle}`, vid: v.id, available: v.available !== false,
       price: parseFloat(v.price), compare: v.compare_at_price ? parseFloat(v.compare_at_price) : 0,
-      code: v.sku || '', meta: (p.body_html || '').replace(/<[^>]+>/g, '').replace(v.sku || '\u0000', '').replace(/^\s*·\s*/, '').trim(),
+      code: v.sku || '', meta: metaFrom(p.body_html || '', v.sku),
       cat: (p.tags || []).find((t) => CATS.some((c) => c.key === t)) || '', category: p.product_type,
       image: p.images[0]?.src || '', created: p.created_at,
     };

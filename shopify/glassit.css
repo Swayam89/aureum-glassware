@@ -404,3 +404,18 @@ body.search-open .search__panel { transform: none; }
 .story__media img { height: auto; }
 .hero__media img { height: auto; }
 .tile img { height: 100%; }
+
+/* ---------- mobile polish: tap targets, no input zoom, lighter paint ---------- */
+@media (max-width: 980px) {
+  .card__btns .btn { height: 44px; }
+  .chips button { height: 42px; }
+  .news__row input { height: 44px; font-size: 16px; }
+  .turn__arrow { width: 46px; height: 46px; margin-top: -23px; }
+  .card__body h3 { font-size: 14px; }
+  .card__body small { font-size: 11px; line-height: 1.4; }
+  .footer__col a { display: inline-block; padding: 6px 0; }
+  .shop__more .btn { width: 100%; max-width: 360px; }
+}
+@media (hover: none) {
+  .btn:hover { transform: none; }
+}
