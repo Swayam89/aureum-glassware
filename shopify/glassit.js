@@ -52,10 +52,9 @@ async function loadProducts() {
   byId = Object.fromEntries(PRODUCTS.map((p) => [p.id, p]));
 }
 
-gsap.registerPlugin(ScrollTrigger);
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const lenis = window.Lenis && !reduced && matchMedia('(pointer: fine)').matches ? new window.Lenis({ lerp: 0.1, smoothWheel: true }) : null;
-if (lenis) { lenis.on('scroll', ScrollTrigger.update); gsap.ticker.add((t) => lenis.raf(t * 1000)); gsap.ticker.lagSmoothing(0); }
+if (lenis) { gsap.ticker.add((t) => lenis.raf(t * 1000)); gsap.ticker.lagSmoothing(0); }
 const scrollToEl = (target, offset = 0) => {
   if (lenis) lenis.scrollTo(target, { offset, duration: 1.3 });
   else (typeof target === 'number' ? window.scrollTo({ top: target, behavior: 'smooth' }) : target.scrollIntoView({ behavior: 'smooth' }));
@@ -172,7 +171,6 @@ $('.js-more')?.addEventListener('click', () => {
   grid.insertAdjacentHTML('beforeend', L.slice(from, shown).map(cardHTML).join(''));
   $('.js-more').hidden = shown >= L.length;
   $('.js-count').textContent = `Showing ${Math.min(shown, L.length)} of ${L.length} designs`;
-  ScrollTrigger.refresh();
 });
 grid?.addEventListener('click', (e) => {
   const c = e.target.closest('[data-cart]'), b = e.target.closest('[data-buy]');
@@ -290,5 +288,4 @@ function webgl() { try { const c = document.createElement('canvas'); return !!(c
     if (webgl()) whenNear($('#turn'), () => initTurn().catch((err) => { console.error(err); $('.js-turn-loading').innerHTML = 'The 3D view could not load on this device.'; }));
     else $('.js-turn-loading').innerHTML = 'The 3D view needs WebGL.';
   }
-  ScrollTrigger.refresh();
 })();
