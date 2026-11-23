@@ -155,7 +155,7 @@ function setFilter(cat) {
 }
 function cardHTML(p, i) {
   return `<article class="card enter" style="animation-delay:${(i % 8) * 50}ms" data-id="${esc(p.id)}">
-    <a class="card__img" href="${p.url}"><img src="${esc(sized(p.image, 700))}" srcset="${esc(sized(p.image, 352))} 352w, ${esc(sized(p.image, 700))} 700w" sizes="(max-width: 980px) 50vw, 25vw" alt="${esc(p.name)}" loading="lazy" decoding="async" width="700" height="780">${mrp(p) > p.price ? `<span class="card__badge">-${off(p)}%</span>` : ''}</a>
+    <a class="card__img" href="${p.url}"><img src="${esc(sized(p.image, 700))}" srcset="${esc(sized(p.image, 352))} 352w, ${esc(sized(p.image, 450))} 450w, ${esc(sized(p.image, 700))} 700w" sizes="(max-width: 980px) 46vw, 25vw" alt="${esc(p.name)}" loading="lazy" decoding="async" width="700" height="780">${mrp(p) > p.price ? `<span class="card__badge">-${off(p)}%</span>` : ''}</a>
     <div class="card__body"><h3><a href="${p.url}">${esc(p.name)}</a></h3><small>${esc(desc(p))}</small><span class="price">${priceHTML(p)}</span>
       <div class="card__btns"><button class="btn btn--line" type="button" data-cart="${esc(p.id)}">Add to cart</button><button class="btn btn--dark" type="button" data-buy="${esc(p.id)}">Shop now</button></div></div>
   </article>`;
