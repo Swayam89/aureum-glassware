@@ -54,7 +54,7 @@ async function loadProducts() {
 
 gsap.registerPlugin(ScrollTrigger);
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-const lenis = window.Lenis && !reduced ? new window.Lenis({ lerp: 0.1, smoothWheel: true }) : null;
+const lenis = window.Lenis && !reduced && matchMedia('(pointer: fine)').matches ? new window.Lenis({ lerp: 0.1, smoothWheel: true }) : null;
 if (lenis) { lenis.on('scroll', ScrollTrigger.update); gsap.ticker.add((t) => lenis.raf(t * 1000)); gsap.ticker.lagSmoothing(0); }
 const scrollToEl = (target, offset = 0) => {
   if (lenis) lenis.scrollTo(target, { offset, duration: 1.3 });
@@ -72,10 +72,13 @@ if (tk) tk.innerHTML += tk.innerHTML;
 
 /* ---------------- nav ---------------- */
 const nav = $('.nav');
+const hide = (el, h) => { if (!el) return; el.setAttribute('aria-hidden', h); el.inert = h; };
+['.bag', '.search', '.drawer-menu'].forEach((q) => hide($(q), true));
 if ($('.ticker')) new IntersectionObserver(([e]) => nav.classList.toggle('is-stuck', !e.isIntersecting)).observe($('.ticker'));
 $('.js-burger')?.addEventListener('click', () => {
   const open = document.body.classList.toggle('menu-open');
   $('.js-burger').setAttribute('aria-expanded', open);
+  hide($('.drawer-menu'), !open);
   open ? lenis?.stop() : lenis?.start();
 });
 document.addEventListener('click', (e) => {
@@ -83,7 +86,7 @@ document.addEventListener('click', (e) => {
   if (!a) return;
   const href = a.getAttribute('href');
   e.preventDefault();
-  if (document.body.classList.contains('menu-open')) { document.body.classList.remove('menu-open'); lenis?.start(); }
+  if (document.body.classList.contains('menu-open')) { document.body.classList.remove('menu-open'); $('.js-burger')?.setAttribute('aria-expanded', false); hide($('.drawer-menu'), true); lenis?.start(); }
   if (a.dataset.cat) setFilter(a.dataset.cat);
   const target = href === '#' || href === '#top' ? 0 : $(href);
   if (target !== null) scrollToEl(target, target === 0 ? 0 : -nav.offsetHeight + 2);
@@ -135,8 +138,8 @@ $('.js-bag-items').addEventListener('click', (e) => {
   const q = Math.max(0, +b.dataset.q);
   changeLine(b.dataset.k, b.dataset.q === '0' ? 0 : Math.max(1, q));
 });
-const openBag = () => { document.body.classList.add('bag-open'); $('.bag').setAttribute('aria-hidden', false); lenis?.stop(); refreshCart(); };
-const closeBag = () => { document.body.classList.remove('bag-open'); $('.bag').setAttribute('aria-hidden', true); lenis?.start(); };
+const openBag = () => { document.body.classList.add('bag-open'); hide($('.bag'), false); lenis?.stop(); refreshCart(); };
+const closeBag = () => { document.body.classList.remove('bag-open'); hide($('.bag'), true); lenis?.start(); };
 $('.js-bag-open').addEventListener('click', openBag);
 $$('.js-bag-close').forEach((b) => b.addEventListener('click', closeBag));
 $('.js-checkout').addEventListener('click', () => { location.href = '/checkout'; });
@@ -147,12 +150,12 @@ const grid = $('.js-grid');
 const list = () => (filter === 'all' ? PRODUCTS : PRODUCTS.filter((p) => p.cat === filter));
 function setFilter(cat) {
   filter = cat; shown = 8;
-  $$('.js-chips button').forEach((b) => b.classList.toggle('on', b.dataset.cat === cat));
+  $$('.js-chips button').forEach((b) => { const on = b.dataset.cat === cat; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on); });
   renderGrid();
 }
 function cardHTML(p, i) {
   return `<article class="card enter" style="animation-delay:${(i % 8) * 50}ms" data-id="${esc(p.id)}">
-    <a class="card__img" href="${p.url}"><img src="${esc(sized(p.image, 700))}" alt="${esc(p.name)}" loading="lazy" width="700" height="780">${mrp(p) > p.price ? `<span class="card__badge">-${off(p)}%</span>` : ''}</a>
+    <a class="card__img" href="${p.url}"><img src="${esc(sized(p.image, 700))}" srcset="${esc(sized(p.image, 352))} 352w, ${esc(sized(p.image, 700))} 700w" sizes="(max-width: 980px) 50vw, 25vw" alt="${esc(p.name)}" loading="lazy" decoding="async" width="700" height="780">${mrp(p) > p.price ? `<span class="card__badge">-${off(p)}%</span>` : ''}</a>
     <div class="card__body"><h3><a href="${p.url}">${esc(p.name)}</a></h3><small>${esc(desc(p))}</small><span class="price">${priceHTML(p)}</span>
       <div class="card__btns"><button class="btn btn--line" type="button" data-cart="${esc(p.id)}">Add to cart</button><button class="btn btn--dark" type="button" data-buy="${esc(p.id)}">Shop now</button></div></div>
   </article>`;
@@ -186,8 +189,8 @@ function highlight(id) {
 }
 
 /* ---------------- search ---------------- */
-const openSearch = () => { document.body.classList.add('search-open'); $('.search').setAttribute('aria-hidden', false); setTimeout(() => $('.js-search').focus(), 60); runSearch(); };
-const closeSearch = () => { document.body.classList.remove('search-open'); $('.search').setAttribute('aria-hidden', true); };
+const openSearch = () => { document.body.classList.add('search-open'); hide($('.search'), false); setTimeout(() => $('.js-search').focus(), 60); runSearch(); };
+const closeSearch = () => { document.body.classList.remove('search-open'); hide($('.search'), true); };
 $('.js-search-open').addEventListener('click', openSearch);
 $('.js-search-close').addEventListener('click', closeSearch);
 $('.search').addEventListener('click', (e) => { if (e.target === e.currentTarget) closeSearch(); });
@@ -226,7 +229,7 @@ async function initTurn() {
     $('.js-t-cat').textContent = p.category; $('.js-t-name').textContent = p.name; $('.js-t-desc').textContent = desc(p);
     $('.js-t-price').innerHTML = priceHTML(p);
     info.classList.remove('swap'); void info.offsetWidth; info.classList.add('swap');
-    $$('button', dots).forEach((b, j) => b.classList.toggle('on', j === i));
+    $$('button', dots).forEach((b, j) => { b.classList.toggle('on', j === i); b.setAttribute('aria-pressed', j === i); });
   };
   const tt = new Turntable($('#turn-canvas'), { onChange: (i) => show(i) });
   show(0);
@@ -252,9 +255,14 @@ async function initTurn() {
 // start the 3D gallery only when it is about to scroll into view (keeps first load light, especially on phones)
 function whenNear(el, fn) {
   if (!el || !('IntersectionObserver' in window)) return fn();
-  const watch = () => { const o = new IntersectionObserver((es) => { if (es.some((e) => e.isIntersecting)) { o.disconnect(); fn(); } }, { rootMargin: '400px 0px' }); o.observe(el); };
+  const watch = () => { const o = new IntersectionObserver((es) => { if (es.some((e) => e.isIntersecting)) { o.disconnect(); fn(); } }, { rootMargin: '300px 0px' }); o.observe(el); };
   const idle = () => (window.requestIdleCallback ? requestIdleCallback(watch, { timeout: 2500 }) : setTimeout(watch, 600));
-  if (document.readyState === 'complete') idle(); else addEventListener('load', idle, { once: true });
+  const ready = () => (document.readyState === 'complete' ? idle() : addEventListener('load', idle, { once: true }));
+  const EV = ['scroll', 'wheel', 'touchstart', 'pointerdown', 'pointermove', 'keydown'];
+  let armed = false;
+  const arm = () => { if (armed) return; armed = true; EV.forEach((t) => removeEventListener(t, arm)); ready(); };
+  EV.forEach((t) => addEventListener(t, arm, { passive: true }));
+  if (scrollY > 0) arm();
 }
 function webgl() { try { const c = document.createElement('canvas'); return !!(c.getContext('webgl2') || c.getContext('webgl')); } catch { return false; } }
 
@@ -269,7 +277,7 @@ function webgl() { try { const c = document.createElement('canvas'); return !!(c
   if (chips) {
     chips.innerHTML = CATS.map((c) => {
       const n = c.key === 'all' ? PRODUCTS.length : PRODUCTS.filter((p) => p.cat === c.key).length;
-      return n || c.key === 'all' ? `<button type="button" data-cat="${c.key}" class="${c.key === 'all' ? 'on' : ''}">${c.name}<small>${n}</small></button>` : '';
+      return n || c.key === 'all' ? `<button type="button" data-cat="${c.key}" class="${c.key === 'all' ? 'on' : ''}" aria-pressed="${c.key === 'all'}">${c.name}<small>${n}</small></button>` : '';
     }).join('');
     $$('button', chips).forEach((b) => b.addEventListener('click', () => setFilter(b.dataset.cat)));
   }

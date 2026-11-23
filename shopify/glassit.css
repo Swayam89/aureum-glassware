@@ -8,7 +8,7 @@
   --stone: #ddd1c1;
   --ink: #1d1a17;
   --ink-2: #3a342e;
-  --muted: #736a60;
+  --muted: #5f574f;
   --line: rgba(29, 26, 23, .12);
   --sale: #9b3b25;
   --gold: #a8803f;
@@ -151,8 +151,10 @@ body.menu-open .drawer-menu { transform: none; }
 .turn__buy { display: flex; align-items: center; gap: 22px; flex-wrap: wrap; justify-content: flex-end; }
 .turn__btns { display: flex; gap: 8px; }
 .turn__dots { grid-column: 1 / -1; display: flex; justify-content: center; gap: 8px; }
-.turn__dots button { width: 34px; height: 3px; background: var(--stone); border-radius: 2px; transition: background .3s, width .4s var(--ease); }
-.turn__dots button.on { background: var(--ink); width: 54px; }
+.turn__dots button { position: relative; width: 34px; height: 24px; transition: width .4s var(--ease); }
+.turn__dots button::before { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 3px; margin-top: -1.5px; background: var(--stone); border-radius: 2px; transition: background .3s; }
+.turn__dots button.on { width: 54px; }
+.turn__dots button.on::before { background: var(--ink); }
 .turn__meta.swap { animation: swap .6s var(--ease); }
 @keyframes swap { from { opacity: 0; transform: translateY(10px); } }
 
@@ -165,7 +167,7 @@ body.menu-open .drawer-menu { transform: none; }
 .chips button { flex: none; height: 38px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--line); font-size: 13px; color: var(--ink-2); transition: all .25s; }
 .chips button:hover { border-color: var(--ink); }
 .chips button.on { background: var(--ink); color: var(--bg); border-color: var(--ink); }
-.chips button small { color: inherit; opacity: .55; margin-left: 4px; }
+.chips button small { color: inherit; opacity: .8; margin-left: 4px; }
 .grid { max-width: var(--max); margin: 0 auto; padding: 0 var(--gutter); display: grid; grid-template-columns: repeat(4, 1fr); gap: clamp(14px, 2vw, 28px) clamp(12px, 1.6vw, 22px); }
 .card { position: relative; display: flex; flex-direction: column; }
 .card__img { position: relative; aspect-ratio: 9 / 10; overflow: hidden; border-radius: 3px; background: var(--sand); }
@@ -231,7 +233,7 @@ body.menu-open .drawer-menu { transform: none; }
 .footer { background: var(--sand); padding: clamp(50px, 7vw, 90px) var(--gutter) calc(30px + env(safe-area-inset-bottom, 0px)); }
 .footer__top { max-width: var(--max); margin: 0 auto; display: grid; grid-template-columns: 1.6fr 1fr 1fr 1fr; gap: 36px; }
 .footer__brand p { color: var(--muted); margin: 16px 0 24px; max-width: 320px; }
-.footer__col h4 { font-size: 11px; letter-spacing: .2em; text-transform: uppercase; margin: 0 0 14px; font-weight: 600; }
+.footer__col h3, .footer__col h4 { font-size: 11px; letter-spacing: .2em; text-transform: uppercase; margin: 0 0 14px; font-weight: 600; }
 .footer__col a { display: block; color: var(--ink-2); font-size: 14px; padding: 4px 0; }
 .footer__col a:hover { text-decoration: underline; }
 .news label { display: block; font-size: 13px; margin-bottom: 10px; }
@@ -419,3 +421,6 @@ body.search-open .search__panel { transform: none; }
 @media (hover: none) {
   .btn:hover { transform: none; }
 }
+
+/* footer column titles are h3 now; keep the small caps label look */
+.footer__col h3 { font-family: var(--sans); letter-spacing: .2em; }
