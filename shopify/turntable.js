@@ -1,12 +1,12 @@
 // Live 3D gallery: Blender-built catalogue products on travertine pedestals in a plaster
 // boutique set (curved backdrop, arched niches, stone floor), lit by a path-traced studio
 // light map. Swipe / drag / arrows move the ring; dragging a glass turns it. Not scroll-driven.
-import * as THREE from 'three';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
-import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
-import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
-import { RectAreaLightUniformsLib } from 'three/addons/lights/RectAreaLightUniformsLib.js';
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.170.0/+esm';
+import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/loaders/GLTFLoader.js/+esm';
+import { DRACOLoader } from 'https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/loaders/DRACOLoader.js/+esm';
+import { RGBELoader } from 'https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/loaders/RGBELoader.js/+esm';
+import { RoundedBoxGeometry } from 'https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/geometries/RoundedBoxGeometry.js/+esm';
+import { RectAreaLightUniformsLib } from 'https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/lights/RectAreaLightUniformsLib.js/+esm';
 
 export const TURN = [
   { key: 'tiger', id: 'smoke-tiger-whisky-glass-set', h: 1.0, glass: { color: 0xb3b7bc, atten: 0x6a6e75, dist: 0.18 }, med: { metal: 1, rough: 0.24, normal: 1.4 }, drink: { color: 0xffd7a3, atten: 0xc0651a, dist: 0.6, level: 0.42 } },
