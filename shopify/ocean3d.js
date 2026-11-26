@@ -254,9 +254,9 @@ export class Sculpture {
       const n = this.items.length, a = (this.cur - (n - 1) / 2) * 0.32;
       const tx = Math.sin(a) * 9, tz = 9 - Math.cos(a) * 9;
       const portrait = this.camera.aspect < 1;
-      const dist = portrait ? 7.2 : 6.2;
-      this.camera.position.set(tx + Math.sin(a) * dist * 0.2, portrait ? 3.4 : 2.9, tz + dist);
-      this.camera.lookAt(tx, 1.05, tz);
+      const dist = portrait ? 6.4 : 5.0;
+      this.camera.position.set(tx + Math.sin(a) * dist * 0.2, portrait ? 2.7 : 2.05, tz + dist);
+      this.camera.lookAt(tx, portrait ? 0.55 : 0.62, tz);
       this.items.forEach((it, k) => {
         const active = k === this.index;
         // idle turn on the active glass, momentum after a drag
