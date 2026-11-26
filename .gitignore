@@ -1,2 +1,12 @@
 .claude/
 .DS_Store
+# web copies live on Shopify Files / compressed variants; keep these sources local only
+assets/hero/*.mp4
+assets/glassit3d/tiger.glb
+assets/glassit3d/lion.glb
+assets/glassit3d/peacock.glb
+assets/glassit3d/dispenser.glb
+assets/glassit3d/coupe.glb
+assets/glassit3d/flute.glb
+assets/glassit3d/studio.hdr
+assets/glassit3d/medallion-*.png
